@@ -1,9 +1,12 @@
 #include "Shader.h"
+
+#include <glad/glad.h> // include glad to get all the required opengl headers
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
+Shader::Shader(const char * vertexPath, const char * fragmentPath)
 {
 	// 1. retrive the vertex/fragment source code from filePath
 	std::string vertexCode;
@@ -99,4 +102,9 @@ void Shader::setInt(const std::string & name, int value) const
 void Shader::setFloat(const std::string & name, float value) const
 {
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setMat4(const std::string & name, glm::mat4& value) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
