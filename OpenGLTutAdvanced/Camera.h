@@ -5,8 +5,6 @@
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 
-#include <vector>
-
 
 enum class ECameraMovement
 {
@@ -24,13 +22,12 @@ const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVTY = 0.1f;
 const float ZOOM = 45.0f;
-
 class Camera
 {
 public:
 	// Camera Attributes
 	glm::vec3 Position;
-	glm::vec3 Front;
+	glm::vec3 Forward;
 	glm::vec3 Up;
 	glm::vec3 Right;
 	glm::vec3 WorldUp;
