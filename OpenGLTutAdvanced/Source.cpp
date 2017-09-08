@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
+#include "SpotLight.h"
 #include <iostream>
 
 #include <glm\glm.hpp>
@@ -167,6 +168,8 @@ int main()
 	objectShader.setInt("material.diffuse", 0);
 	objectShader.setInt("material.specular", 1);
 
+	// instantiate spotlight
+	SpotLight spotLight;
 	//---------------------------------------------
 	// now lets create a very simple render loop
 	while (!glfwWindowShouldClose(window))
@@ -192,16 +195,19 @@ int main()
 
 		// activate shader
 		objectShader.use();
-		objectShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		objectShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken the light a bit to fit the scene
-		objectShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		objectShader.setVec3("light.position", camera.Position);
-		objectShader.setVec3("light.direction", camera.Forward);
-		objectShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-		objectShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-		objectShader.setFloat("light.constant", 1.0f);
-		objectShader.setFloat("light.linear", 0.09f);
-		objectShader.setFloat("light.quadratic", 0.032f);
+		//objectShader.setVec3("spotLight.ambient", 0.2f, 0.2f, 0.2f);
+		//objectShader.setVec3("spotLight.diffuse", 0.5f, 0.5f, 0.5f); // darken the light a bit to fit the scene
+		//objectShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+		//objectShader.setVec3("spotLight.position", camera.Position);
+		//objectShader.setVec3("spotLight.direction", camera.Forward);
+		//objectShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+		//objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+		//objectShader.setFloat("spotLight.constant", 1.0f);
+		spotLight.direction = camera.Forward;
+		spotLight.SetPosition(camera.Position);
+		spotLight.SetShaderUniforms(objectShader);
+		objectShader.setFloat("spotLight.linear", 0.09f);
+		objectShader.setFloat("spotLight.quadratic", 0.032f);
 		objectShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 		objectShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 		objectShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
@@ -286,6 +292,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		lastY = (float)ypos;
 		firstMouse = false;
 	}
+
 	float xoffset = (float)xpos - lastX;
 	float yoffset = lastY - (float)ypos; // reversed since y-coordinates range from bottom to top
 	lastX = (float)xpos;
