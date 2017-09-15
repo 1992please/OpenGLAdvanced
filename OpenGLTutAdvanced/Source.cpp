@@ -2,15 +2,15 @@
 #include <GLFW\glfw3.h>
 
 #include "Shader.h"
-#include "Texture.h"
+#include "Image.h"
 #include "Camera.h"
 #include "SpotLight.h"
 #include "FbxFileReader.h"
+#include "Mesh.h"
 #include <iostream>
 
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
-#include <glm\gtc\type_ptr.hpp>
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -31,8 +31,8 @@ int MainProgram();
 
 int main()
 {
-	FbxFileReader x("C:\\Users\\Nader\\Desktop\\cube.fbx");
-	return MainProgram();
+	//FbxFileReader x("C:\\Users\\Nader\\Desktop\\cube.fbx");
+	return 0;// MainProgram();
 }
 
 int MainProgram()
@@ -79,8 +79,8 @@ int MainProgram()
 	Shader lightShader("shaders\\light_shader.vs", "shaders\\light_shader.fs");
 
 	//load textures
-	Texture diffuseMap("textures\\container2.png");
-	Texture specularMap("textures\\container2_specular.png");
+	Image diffuseMap("textures\\container2.png");
+	Image specularMap("textures\\container2_specular.png");
 	// load our model
 	float vertices[] = {
 		// positions          // normals           // texture coords
@@ -142,9 +142,10 @@ int MainProgram()
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glBindVertexArray(VAO);
 
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);

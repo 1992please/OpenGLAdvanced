@@ -1,4 +1,4 @@
-#include "Texture.h"
+#include "Image.h"
 
 #include <glad/glad.h>
 
@@ -6,7 +6,7 @@
 #include "stb_image.h"
 #include <iostream>
 
-Texture::Texture(const char* texPath)
+Image::Image(const char* texPath)
 {
 	glGenTextures(1, &ID);
 
@@ -46,7 +46,7 @@ Texture::Texture(const char* texPath)
 	stbi_image_free(data);
 }
 
-void Texture::ActivateAs(unsigned int index)
+void Image::ActivateAs(unsigned int index)
 {
 	assert(index < 32);
 	glActiveTexture(GL_TEXTURE0 + index);
