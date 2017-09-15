@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "SpotLight.h"
+#include "FbxFileReader.h"
 #include <iostream>
 
 #include <glm\glm.hpp>
@@ -26,9 +27,15 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool firstMouse = true;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastX, lastY;
-
+int MainProgram();
 
 int main()
+{
+	FbxFileReader x("C:\\Users\\Nader\\Desktop\\cube.fbx");
+	return MainProgram();
+}
+
+int MainProgram()
 {
 	// setting up glfw settings
 	glfwInit();
@@ -40,7 +47,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
 #endif
 
-	// create the window object
+														 // create the window object
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
@@ -68,12 +75,12 @@ int main()
 	// OpenGL settings
 	glEnable(GL_DEPTH_TEST);
 	//load our shader
-	Shader objectShader("object_shader.vs", "object_shader.fs");
-	Shader lightShader("light_shader.vs", "light_shader.fs");
+	Shader objectShader("shaders\\object_shader.vs", "shaders\\object_shader.fs");
+	Shader lightShader("shaders\\light_shader.vs", "shaders\\light_shader.fs");
 
 	//load textures
-	Texture diffuseMap("container2.png");
-	Texture specularMap("container2_specular.png");
+	Texture diffuseMap("textures\\container2.png");
+	Texture specularMap("textures\\container2_specular.png");
 	// load our model
 	float vertices[] = {
 		// positions          // normals           // texture coords
