@@ -1,4 +1,4 @@
-#include "Image.h"
+#include "Texture.h"
 
 #include <glad/glad.h>
 
@@ -6,10 +6,13 @@
 #include "stb_image.h"
 #include <iostream>
 
-Image::Image(const char* texPath)
+Texture::Texture()
 {
 	glGenTextures(1, &ID);
+}
 
+void Texture::LoadTexture(const char * texPath)
+{
 	// load and generate the texture
 	stbi_set_flip_vertically_on_load(true);
 	int width, height, nrComponents;
@@ -30,25 +33,35 @@ Image::Image(const char* texPath)
 				break;
 		}
 
+		// OpenGL shit here....
 		glBindTexture(GL_TEXTURE_2D, ID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		bLoaded = true;
+
 	}
 	else
 	{
+		ID = -1;
 		std::cout << "Failed to load texture" << std::endl;
+		bLoaded = false;
 	}
 	stbi_image_free(data);
 }
 
-void Image::ActivateAs(unsigned int index)
+void Texture::ActivateAs(unsigned int index)
 {
 	assert(index < 32);
 	glActiveTexture(GL_TEXTURE0 + index);
 	glBindTexture(GL_TEXTURE_2D, ID);
+}
+
+Texture::~Texture()
+{
+	glDeleteTextures(1, &ID);
 }

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLTutAdvanced", "OpenGLTutAdvanced\OpenGLTutAdvanced.vcxproj", "{3362265B-C433-4E79-A401-23A8DD679FDF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics_app01", "graphics_app01\graphics_app01.vcxproj", "{18A7A029-A82D-49B0-853A-310083137AC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,19 @@ Global
 		{3362265B-C433-4E79-A401-23A8DD679FDF}.Release|x64.Build.0 = Release|x64
 		{3362265B-C433-4E79-A401-23A8DD679FDF}.Release|x86.ActiveCfg = Release|Win32
 		{3362265B-C433-4E79-A401-23A8DD679FDF}.Release|x86.Build.0 = Release|Win32
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Debug|x64.ActiveCfg = Debug|x64
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Debug|x64.Build.0 = Debug|x64
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Debug|x86.ActiveCfg = Debug|Win32
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Debug|x86.Build.0 = Debug|Win32
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Release|x64.ActiveCfg = Release|x64
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Release|x64.Build.0 = Release|x64
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Release|x86.ActiveCfg = Release|Win32
+		{18A7A029-A82D-49B0-853A-310083137AC3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC6BB4FC-1916-4104-A105-07C4FDDF50C9}
 	EndGlobalSection
 EndGlobal

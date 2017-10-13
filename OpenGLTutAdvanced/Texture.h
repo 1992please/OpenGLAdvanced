@@ -1,11 +1,14 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 #include <string>
-class Image
+class Texture
 {
 public:
 	unsigned int ID;
-	Image(const char* texPath);
+	bool bLoaded;
+	Texture();
+	void LoadTexture(const char* texPath);
 	void ActivateAs(unsigned int index);
+	~Texture();
 };
 #endif // !TEXTURE_H

@@ -1,17 +1,12 @@
-#include <glad\glad.h>
+#include "GlobalDefinitions.h"
 #include <GLFW\glfw3.h>
 
-#include "Shader.h"
-#include "Image.h"
+#include "Texture.h"
 #include "Camera.h"
-#include "SpotLight.h"
-#include "FbxFileReader.h"
-#include "Mesh.h"
+#include "DirectionalLight.h"
 #include <iostream>
-
-#include <glm\glm.hpp>
-#include <glm\gtc\matrix_transform.hpp>
-
+#include "FbxSceneReader.h"
+#include "SceneCache.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -31,8 +26,7 @@ int MainProgram();
 
 int main()
 {
-	//FbxFileReader x("C:\\Users\\Nader\\Desktop\\cube.fbx");
-	return 0;// MainProgram();
+	return  MainProgram();
 }
 
 int MainProgram()
@@ -43,9 +37,6 @@ int MainProgram()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
 														 // create the window object
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearOpenGL", NULL, NULL);
@@ -79,8 +70,17 @@ int MainProgram()
 	Shader lightShader("shaders\\light_shader.vs", "shaders\\light_shader.fs");
 
 	//load textures
-	Image diffuseMap("textures\\container2.png");
-	Image specularMap("textures\\container2_specular.png");
+	Texture diffuseMap;
+	diffuseMap.LoadTexture("textures\\container2.png");
+	Texture specularMap;
+	specularMap.LoadTexture("textures\\container2_specular.png");
+	
+	// Import FBX
+	FbxSceneReader lScene("C:\\Users\\Nader\\Desktop\\nanosuit.fbx");
+	lScene.LoadFile();
+	FbxArray<Mesh*> lMeshes;
+	lScene.GetStaticMeshes(lMeshes);
+	Mesh* lMesh = lMeshes[0];
 	// load our model
 	float vertices[] = {
 		// positions          // normals           // texture coords
@@ -172,12 +172,14 @@ int MainProgram()
 	// lastFrameTime
 	float lastFrame = 0.0f; // Time of last frame
 
-	objectShader.use();
-	objectShader.setInt("material.diffuse", 0);
-	objectShader.setInt("material.specular", 1);
 
+	//diffuseMap.ActivateAs(0);
+	//specularMap.ActivateAs(1);
+	//objectShader.use();
+	//objectShader.setInt("material.diffuse", 0);
+	//objectShader.setInt("material.specular", 1);
 	// instantiate spotlight
-	SpotLight spotLight;
+	DirectionalLight dirLight;
 	//---------------------------------------------
 	// now lets create a very simple render loop
 	while (!glfwWindowShouldClose(window))
@@ -203,44 +205,29 @@ int MainProgram()
 
 		// activate shader
 		objectShader.use();
-		//objectShader.setVec3("spotLight.ambient", 0.2f, 0.2f, 0.2f);
-		//objectShader.setVec3("spotLight.diffuse", 0.5f, 0.5f, 0.5f); // darken the light a bit to fit the scene
-		//objectShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-		//objectShader.setVec3("spotLight.position", camera.Position);
-		//objectShader.setVec3("spotLight.direction", camera.Forward);
-		//objectShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-		//objectShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
-		//objectShader.setFloat("spotLight.constant", 1.0f);
-		spotLight.direction = camera.Forward;
-		spotLight.SetPosition(camera.Position);
-		spotLight.SetShaderUniforms(objectShader);
-		objectShader.setFloat("spotLight.linear", 0.09f);
-		objectShader.setFloat("spotLight.quadratic", 0.032f);
-		objectShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-		objectShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-		objectShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		objectShader.setFloat("material.shininess", 32.0f);
-
+		dirLight.direction = glm::vec3(.5f, -.5f, 0);
+		dirLight.SetShaderUniforms(objectShader);
 		objectShader.setVec3("viewPos", camera.Position);
-
 		objectShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
 		objectShader.setMat4("view", view);
-
+		glm::mat4 model;
+		objectShader.setMat4("model", model);
 		//bind diffuse map
-		diffuseMap.ActivateAs(0);
-		specularMap.ActivateAs(1);
 
-		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			glm::mat4 model;
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			objectShader.setMat4("model", model);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		lMesh->DrawALL(SHADING_MODE_SHADED, &objectShader);
+
+		//glBindVertexArray(VAO);
+		//for (unsigned int i = 0; i < 10; i++)
+		//{
+		//	glm::mat4 model;
+		//	model = glm::translate(model, cubePositions[i]);
+		//	float angle = 20.0f * i;
+		//	model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		//	objectShader.setMat4("model", model);
+
+		//	glDrawArrays(GL_TRIANGLES, 0, 36);
+		//}
 
 		lightShader.use();
 		lightShader.setMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
