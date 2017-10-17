@@ -8,7 +8,7 @@ public:
 	bool bLoaded;
 	Texture();
 	void LoadTexture(const char* texPath);
-	void ActivateAs(unsigned int index);
+	void Bind(unsigned int index);
 	~Texture();
 };
 #endif // !TEXTURE_H

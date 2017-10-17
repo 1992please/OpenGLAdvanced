@@ -1,5 +1,5 @@
 #include "glfw_backend.h"
-#include "MainApp.h"
+#include "main_app.h"
 
 
 int main(int argc, char** argv)

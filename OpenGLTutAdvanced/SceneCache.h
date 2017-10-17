@@ -2,13 +2,13 @@
 #include "GlobalDefinitions.h"
 #include <fbxsdk.h>
 
-
-class Material
+struct FStaticMesh;
+struct FMaterial
 {
 public:
-	Material();
-	Material(const FbxSurfaceMaterial* pMaterial);
-	~Material();
+	FMaterial();
+	FMaterial(const FbxSurfaceMaterial* pMaterial);
+	~FMaterial();
 	void UseShader(Shader* pShader);
 	bool HasTexture() const { return mDiffuse.mTexture != 0; }
 	static 	FbxDouble3 GetMaterialProperty(const FbxSurfaceMaterial* pMaterial, const char * pPropertyName, const char * pFactorPropertyName, Texture** pTextureName);
@@ -64,12 +64,11 @@ private:
 
 	// For every material, record the offsets in every VBO and triangle counts
 	FbxArray<SubMesh*> mSubMeshes;
-	FbxArray<Material*> mMaterials;
+	FMaterial** mMaterials;
 	GLuint mVBOs[VBO_COUNT], mVAO;
 	bool mHasNormal;
 	bool mHasUV;
 	bool mAllByControlPoint; // Save data in VBO by control point or by polygon vertex.
 
-	bool InitializeSubMeshes(const FbxMesh*  pNode);
-	void InitializeMaterials(const FbxNode*  pNode);
+	bool InitializeSubMeshes(const FStaticMesh* lMesh);
 };

@@ -54,7 +54,7 @@ void Texture::LoadTexture(const char * texPath)
 	stbi_image_free(data);
 }
 
-void Texture::ActivateAs(unsigned int index)
+void Texture::Bind(unsigned int index)
 {
 	assert(index < 32);
 	glActiveTexture(GL_TEXTURE0 + index);

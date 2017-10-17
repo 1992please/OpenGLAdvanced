@@ -1,139 +1,15 @@
 #include <vector>
 #include "SceneCache.h"
-namespace
-{
-	const float ANGLE_TO_RADIAN = 3.1415926f / 180.f;
-	const GLfloat BLACK_COLOR[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	const GLfloat GREEN_COLOR[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-	const GLfloat WHITE_COLOR[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const GLfloat WIREFRAME_COLOR[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	const int TRIANGLE_VERTEX_COUNT = 3;
 
-	// Four floats for every position.
-	const int VERTEX_STRIDE = 3;
-	// Three floats for every normal.
-	const int NORMAL_STRIDE = 3;
-	// Two floats for every UV.
-	const int UV_STRIDE = 2;
-}
+const int TRIANGLE_VERTEX_COUNT = 3;
+// Four floats for every position.
+const int VERTEX_STRIDE = 3;
+// Three floats for every normal.
+const int NORMAL_STRIDE = 3;
+// Two floats for every UV.
+const int UV_STRIDE = 2;
 
-Material::Material()
-{
-}
-
-Material::Material(const FbxSurfaceMaterial* pMaterial)
-{
-	const FbxDouble3 lEmissive = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, &mEmissive.mTexture);
-	mEmissive.mColor[0] = static_cast<GLfloat>(lEmissive[0]);
-	mEmissive.mColor[1] = static_cast<GLfloat>(lEmissive[1]);
-	mEmissive.mColor[2] = static_cast<GLfloat>(lEmissive[2]);
-
-	const FbxDouble3 lAmbient = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, &mAmbient.mTexture);
-	mAmbient.mColor[0] = static_cast<GLfloat>(lAmbient[0]);
-	mAmbient.mColor[1] = static_cast<GLfloat>(lAmbient[1]);
-	mAmbient.mColor[2] = static_cast<GLfloat>(lAmbient[2]);
-
-	const FbxDouble3 lDiffuse = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, &mDiffuse.mTexture);
-	mDiffuse.mColor[0] = static_cast<GLfloat>(lDiffuse[0]);
-	mDiffuse.mColor[1] = static_cast<GLfloat>(lDiffuse[1]);
-	mDiffuse.mColor[2] = static_cast<GLfloat>(lDiffuse[2]);
-
-	const FbxDouble3 lSpecular = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, &mSpecular.mTexture);
-	mSpecular.mColor[0] = static_cast<GLfloat>(lSpecular[0]);
-	mSpecular.mColor[1] = static_cast<GLfloat>(lSpecular[1]);
-	mSpecular.mColor[2] = static_cast<GLfloat>(lSpecular[2]);
-
-	FbxProperty lShininessProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sShininess);
-	if (lShininessProperty.IsValid())
-	{
-		double lShininess = lShininessProperty.Get<FbxDouble>();
-		mShinness = static_cast<GLfloat>(lShininess);
-	}
-}
-
-
-FbxDouble3 Material::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, const char * pPropertyName, const char * pFactorPropertyName, Texture** pTexture)
-{
-	FbxDouble3 lResult(0, 0, 0);
-	const FbxProperty lProperty = pMaterial->FindProperty(pPropertyName);
-	const FbxProperty lFactorProperty = pMaterial->FindProperty(pFactorPropertyName);
-	if (lProperty.IsValid() && lFactorProperty.IsValid())
-	{
-		lResult = lProperty.Get<FbxDouble3>();
-		double lFactor = lFactorProperty.Get<FbxDouble>();
-		if (lFactor != 1)
-		{
-			lResult[0] *= lFactor;
-			lResult[1] *= lFactor;
-			lResult[2] *= lFactor;
-		}
-	}
-
-	if (lProperty.IsValid())
-	{
-		const int lTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>();
-		if (lTextureCount)
-		{
-			const FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>();
-			if (lTexture && lTexture->GetUserDataPtr())
-			{
-				*pTexture = static_cast<Texture *>(lTexture->GetUserDataPtr());
-			}
-		}
-	}
-
-	return lResult;
-}
-
-Material::~Material()
-{
-}
-
-void Material::UseShader(Shader * pShader)
-{
-	if (mDiffuse.mTexture)
-		mDiffuse.mTexture->ActivateAs(0);
-	if (mSpecular.mTexture)
-		mSpecular.mTexture->ActivateAs(1);
-
-	pShader->use();
-	pShader->setInt("material.diffuse", 0);
-	pShader->setInt("material.specular", 1);
-	pShader->setFloat("material.shininess", 32.0f);
-}
-
-Mesh::Mesh(FbxNode* pNode) :mAllByControlPoint(true), mHasUV(false),mHasNormal(false)
-{
-	FbxMesh* lMesh = pNode->GetMesh();
-	if (lMesh)
-	{
-		InitializeSubMeshes(lMesh);
-		InitializeMaterials(pNode);
-	}
-
-}
-
-Mesh::~Mesh()
-{
-
-	for (int i = 0; i < mSubMeshes.GetCount(); i++)
-	{
-		delete mSubMeshes[i];
-	}
-
-	for (int i = 0; i < mMaterials.GetCount(); i++)
-	{
-		delete mMaterials[i];
-	}
-
-	mSubMeshes.Clear();
-}
-
-struct StaticMesh
+struct FStaticMesh
 {
 	float* mVertices;
 	float* mNormals;
@@ -143,9 +19,10 @@ struct StaticMesh
 	int mPolygonCount;
 	int* mSubMeshesOffsets;
 	int* mSubMeshesTriangleCounts;
+	FMaterial** mMaterials;
 	int mSubMeshesCount;
 
-	~StaticMesh()
+	~FStaticMesh()
 	{
 		if (mVertices)
 			delete[] mVertices;
@@ -162,12 +39,17 @@ struct StaticMesh
 	}
 };
 
-static bool GetStaticMeshInfo(const FbxMesh* pFbxMesh, StaticMesh& _Mesh)
+static bool GetStaticMeshInfo(FbxNode* pNode, FStaticMesh& _Mesh)
 {
-	if (!pFbxMesh->GetNode())
+	// Meshes info----------------------------------------------------
+	if (!pNode)
+		return false;
+	FbxMesh* pFbxMesh = pNode->GetMesh();
+
+	if (!pFbxMesh)
 		return false;
 
-	_Mesh.mSubMeshesCount = pFbxMesh->GetNode()->GetMaterialCount();
+	_Mesh.mSubMeshesCount = pNode->GetMaterialCount();
 	_Mesh.mSubMeshesOffsets = new int[_Mesh.mSubMeshesCount];
 	_Mesh.mSubMeshesTriangleCounts = new int[_Mesh.mSubMeshesCount];
 
@@ -391,28 +273,162 @@ static bool GetStaticMeshInfo(const FbxMesh* pFbxMesh, StaticMesh& _Mesh)
 	_Mesh.mUVs = lUVs;
 	_Mesh.mVertexCount = lPolygonVertexCount;
 	_Mesh.mPolygonCount = lPolygonCount;
+
+	// Material info---------------------------------------------------
+
+	const int lMaterialCount = _Mesh.mSubMeshesCount;
+	_Mesh.mMaterials = new FMaterial*[lMaterialCount];
+	for (int lMaterialIndex = 0; lMaterialIndex < lMaterialCount; ++lMaterialIndex)
+	{
+		FbxSurfaceMaterial * lMaterial = pNode->GetMaterial(lMaterialIndex);
+		if (lMaterial)
+		{
+			_Mesh.mMaterials[lMaterialIndex] = new FMaterial(lMaterial);
+		}
+	}
+
 	return true;
 }
 
-bool Mesh::InitializeSubMeshes(const FbxMesh * pMesh)
+
+FMaterial::FMaterial()
 {
-	StaticMesh lMesh;
-	GetStaticMeshInfo(pMesh, lMesh);
+}
+
+FMaterial::FMaterial(const FbxSurfaceMaterial* pMaterial)
+{
+	const FbxDouble3 lEmissive = GetMaterialProperty(pMaterial,
+		FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, &mEmissive.mTexture);
+	mEmissive.mColor[0] = static_cast<GLfloat>(lEmissive[0]);
+	mEmissive.mColor[1] = static_cast<GLfloat>(lEmissive[1]);
+	mEmissive.mColor[2] = static_cast<GLfloat>(lEmissive[2]);
+
+	const FbxDouble3 lAmbient = GetMaterialProperty(pMaterial,
+		FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, &mAmbient.mTexture);
+	mAmbient.mColor[0] = static_cast<GLfloat>(lAmbient[0]);
+	mAmbient.mColor[1] = static_cast<GLfloat>(lAmbient[1]);
+	mAmbient.mColor[2] = static_cast<GLfloat>(lAmbient[2]);
+
+	const FbxDouble3 lDiffuse = GetMaterialProperty(pMaterial,
+		FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, &mDiffuse.mTexture);
+	mDiffuse.mColor[0] = static_cast<GLfloat>(lDiffuse[0]);
+	mDiffuse.mColor[1] = static_cast<GLfloat>(lDiffuse[1]);
+	mDiffuse.mColor[2] = static_cast<GLfloat>(lDiffuse[2]);
+
+	const FbxDouble3 lSpecular = GetMaterialProperty(pMaterial,
+		FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, &mSpecular.mTexture);
+	mSpecular.mColor[0] = static_cast<GLfloat>(lSpecular[0]);
+	mSpecular.mColor[1] = static_cast<GLfloat>(lSpecular[1]);
+	mSpecular.mColor[2] = static_cast<GLfloat>(lSpecular[2]);
+
+	FbxProperty lShininessProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sShininess);
+	if (lShininessProperty.IsValid())
+	{
+		double lShininess = lShininessProperty.Get<FbxDouble>();
+		mShinness = static_cast<GLfloat>(lShininess);
+	}
+}
+
+
+FbxDouble3 FMaterial::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, const char * pPropertyName, const char * pFactorPropertyName, Texture** pTexture)
+{
+	FbxDouble3 lResult(0, 0, 0);
+	const FbxProperty lProperty = pMaterial->FindProperty(pPropertyName);
+	const FbxProperty lFactorProperty = pMaterial->FindProperty(pFactorPropertyName);
+	if (lProperty.IsValid() && lFactorProperty.IsValid())
+	{
+		lResult = lProperty.Get<FbxDouble3>();
+		double lFactor = lFactorProperty.Get<FbxDouble>();
+		if (lFactor != 1)
+		{
+			lResult[0] *= lFactor;
+			lResult[1] *= lFactor;
+			lResult[2] *= lFactor;
+		}
+	}
+
+	if (lProperty.IsValid())
+	{
+		const int lTextureCount = lProperty.GetSrcObjectCount<FbxFileTexture>();
+		if (lTextureCount)
+		{
+			const FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>();
+			if (lTexture && lTexture->GetUserDataPtr())
+			{
+				*pTexture = static_cast<Texture *>(lTexture->GetUserDataPtr());
+			}
+		}
+	}
+
+	return lResult;
+}
+
+FMaterial::~FMaterial()
+{
+}
+
+void FMaterial::UseShader(Shader * pShader)
+{
+	if (mDiffuse.mTexture)
+		mDiffuse.mTexture->Bind(0);
+	if (mSpecular.mTexture)
+		mSpecular.mTexture->Bind(1);
+
+	pShader->use();
+	pShader->setInt("material.diffuse", 0);
+	pShader->setInt("material.specular", 1);
+	pShader->setFloat("material.shininess", 32.0f);
+}
+
+Mesh::Mesh(FbxNode* pNode) :mAllByControlPoint(true), mHasUV(false), mHasNormal(false)
+{
+	FStaticMesh lMesh;
+	if (GetStaticMeshInfo(pNode, lMesh))
+	{
+		InitializeSubMeshes(&lMesh);
+		mMaterials = lMesh.mMaterials;
+	}
+
+}
+
+Mesh::~Mesh()
+{
+
+	for (int i = 0; i < mSubMeshes.GetCount(); i++)
+	{
+		delete mSubMeshes[i];
+	}
+
+	for (int i = 0; i < mSubMeshes.GetCount(); i++)
+	{
+		delete mMaterials[i];
+	}
+
+	mSubMeshes.Clear();
+	delete[] mMaterials;
+}
+
+
+
+
+
+bool Mesh::InitializeSubMeshes(const FStaticMesh* lMesh)
+{
 	// just to continue the code
-	mSubMeshes.Resize(lMesh.mSubMeshesCount);
+	mSubMeshes.Resize(lMesh->mSubMeshesCount);
 	for (int i = 0; i < mSubMeshes.GetCount(); i++)
 	{
 		mSubMeshes[i] = new SubMesh();
-		mSubMeshes[i]->IndexOffset = lMesh.mSubMeshesOffsets[i];
-		mSubMeshes[i]->TriangleCount = lMesh.mSubMeshesTriangleCounts[i];
+		mSubMeshes[i]->IndexOffset = lMesh->mSubMeshesOffsets[i];
+		mSubMeshes[i]->TriangleCount = lMesh->mSubMeshesTriangleCounts[i];
 	}
 	// Create VBOs
-	const int lPolygonVertexCount = lMesh.mVertexCount;
-	const int lPolygonCount = lMesh.mPolygonCount;
-	float * const lVertices = lMesh.mVertices;
-	float * const lNormals = lMesh.mNormals;
-	float * const lUVs = lMesh.mUVs;
-	GLuint * const lIndices = lMesh.mIndices;
+	const int lPolygonVertexCount = lMesh->mVertexCount;
+	const int lPolygonCount = lMesh->mPolygonCount;
+	float * const lVertices = lMesh->mVertices;
+	float * const lNormals = lMesh->mNormals;
+	float * const lUVs = lMesh->mUVs;
+	GLuint * const lIndices = lMesh->mIndices;
 
 	glGenVertexArrays(1, &mVAO);
 	glGenBuffers(VBO_COUNT, mVBOs);
@@ -444,21 +460,6 @@ bool Mesh::InitializeSubMeshes(const FbxMesh * pMesh)
 
 	glBindVertexArray(0);
 	return true;
-}
-
-void Mesh::InitializeMaterials(const FbxNode * pNode)
-{
-	// Bake material and hook as user data.
-	const int lMaterialCount = pNode->GetMaterialCount();
-	mMaterials.Resize(lMaterialCount);
-	for (int lMaterialIndex = 0; lMaterialIndex < lMaterialCount; ++lMaterialIndex)
-	{
-		FbxSurfaceMaterial * lMaterial = pNode->GetMaterial(lMaterialIndex);
-		if (lMaterial)
-		{
-			mMaterials[lMaterialIndex] = new Material(lMaterial);
-		}
-	}
 }
 
 void Mesh::DrawALL(ShadingMode ShadingMode, Shader* pShader)

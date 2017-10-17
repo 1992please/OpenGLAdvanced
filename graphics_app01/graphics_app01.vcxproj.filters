@@ -5,61 +5,42 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{9019f18c-2a7e-48a6-b6a2-e7165575e8c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sources">
-      <UniqueIdentifier>{b1235b40-c4d1-40e6-8b14-ff06236a6bb5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graphics_app.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="types.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="callbacks.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="keys.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="util.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="glfw_backend.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="MainApp.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Technique.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
+    <ClInclude Include="callbacks.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="FbxUtil.h" />
+    <ClInclude Include="glfw_backend.h" />
+    <ClInclude Include="graphics_app.h" />
+    <ClInclude Include="keys.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="Technique.h" />
+    <ClInclude Include="lighting_technique.h" />
+    <ClInclude Include="main_app.h" />
+    <ClInclude Include="basic_mesh.h" />
+    <ClInclude Include="lights_common.h" />
+    <ClInclude Include="pipeline.h" />
+    <ClInclude Include="math_3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="graphics_app.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="glfw_backend.cpp">
-      <Filter>Headers</Filter>
-    </ClCompile>
-    <ClCompile Include="util.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="MainApp.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Technique.cpp">
-      <Filter>Headers</Filter>
-    </ClCompile>
+    <ClCompile Include="FbxUtil.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="glfw_backend.cpp" />
+    <ClCompile Include="graphics_app.cpp" />
+    <ClCompile Include="Technique.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="util.cpp" />
+    <ClCompile Include="lighting_technique.cpp" />
+    <ClCompile Include="main_app.cpp" />
+    <ClCompile Include="basic_mesh.cpp" />
+    <ClCompile Include="pipeline.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\lighting.vs" />
+    <None Include="shaders\lighting.fs" />
   </ItemGroup>
 </Project>

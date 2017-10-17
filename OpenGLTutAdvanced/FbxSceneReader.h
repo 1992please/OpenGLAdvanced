@@ -3,7 +3,6 @@
 #include <fbxsdk.h>
 
 class Mesh;
-
 class FbxSceneReader
 {
 public:

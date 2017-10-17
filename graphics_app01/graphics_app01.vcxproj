@@ -130,24 +130,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="basic_mesh.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="FbxUtil.h" />
     <ClInclude Include="glfw_backend.h" />
     <ClInclude Include="graphics_app.h" />
     <ClInclude Include="keys.h" />
-    <ClInclude Include="MainApp.h" />
+    <ClInclude Include="lighting_technique.h" />
+    <ClInclude Include="main_app.h" />
+    <ClInclude Include="lights_common.h" />
+    <ClInclude Include="math_3d.h" />
+    <ClInclude Include="pipeline.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Technique.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basic_mesh.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="FbxUtil.cpp" />
     <ClCompile Include="glfw_backend.cpp" />
     <ClCompile Include="graphics_app.cpp" />
-    <ClCompile Include="MainApp.cpp" />
+    <ClCompile Include="lighting_technique.cpp" />
+    <ClCompile Include="main_app.cpp" />
+    <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Technique.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\lighting.fs" />
+    <None Include="shaders\lighting.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
