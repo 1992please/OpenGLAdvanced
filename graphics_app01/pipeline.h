@@ -56,12 +56,12 @@ private:
 		glm::vec3 Up;
 	} mCamera;
 
-	glm::mat4 mMVPtransformation;
-	glm::mat4 mVPtransformation;
-	glm::mat4 mMPtransformation;
-	glm::mat4 mMVtransformation;
-	glm::mat4 mMtransformation;
-	glm::mat4 mVtransformation;
-	glm::mat4 mProjTransformation;
+	glm::mat4 mMVP;
+	glm::mat4 mVP;
+	glm::mat4 mMP;
+	glm::mat4 mMV;
+	glm::mat4 mM;
+	glm::mat4 mV;
+	glm::mat4 mP;
 };
 #endif // !PIPELINE_H

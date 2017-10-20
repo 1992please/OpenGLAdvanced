@@ -36,13 +36,17 @@ void Technique::Enable()
 	glUseProgram(mShaderProg);
 }
 
-bool Technique::AddShader(const char* vertexPath, const char* fShaderFile)
+bool Technique::AddShader(const char* vertexPath, const char* fragmentPath)
 {
 	// 1. retrive the vertex/fragment source code from filePath
 	std::string vertexCode;
 	std::string fragmentCode;
 
 	if (!ReadFile(vertexPath, vertexCode)) {
+		return false;
+	}
+
+	if (!ReadFile(fragmentPath, fragmentCode)) {
 		return false;
 	}
 
@@ -77,6 +81,7 @@ bool Technique::AddShader(const char* vertexPath, const char* fShaderFile)
 	{
 		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		return false;
 	}
 
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
@@ -84,12 +89,14 @@ bool Technique::AddShader(const char* vertexPath, const char* fShaderFile)
 	{
 		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		return false;
 	}
 
 	glGetProgramiv(mShaderProg, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(mShaderProg, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
+		return false;
 	}
 #endif // _DEBUG
 

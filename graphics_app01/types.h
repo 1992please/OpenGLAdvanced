@@ -1,5 +1,5 @@
-#ifndef OGLDEV_TYPES_H
-#define	OGLDEV_TYPES_H
+#ifndef TYPES_H
+#define	TYPES_H
 
 typedef unsigned int uint;
 typedef unsigned short ushort;

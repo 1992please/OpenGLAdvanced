@@ -15,10 +15,8 @@ struct PersProjInfo
 
 struct OrthoProjInfo
 {
-	float r;        // right
-	float l;        // left
-	float b;        // bottom
-	float t;        // top
+	float r;
+	float t;
 	float n;        // z near
 	float f;        // z far
 };

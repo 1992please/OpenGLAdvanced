@@ -16,6 +16,17 @@ namespace
 		Result[3][2] = -1.0;
 		return Result;
 	}
+
+	glm::mat4 InitOrthoProjTransform(const OrthoProjInfo& p)
+	{
+		glm::mat4 Result(0);
+		Result[0][0] = 1/ p.r;
+		Result[1][1] = 1/ p.t;
+		Result[2][2] = -2.0f /(p.f - p.n);
+		Result[2][3] = -(p.f + p.n) / (p.f - p.n);
+		Result[3][3] = 1.0;
+		return Result;
+	}
 }
 
 Pipeline::Pipeline()
@@ -92,39 +103,73 @@ void Pipeline::Orient(const Orientation & o)
 
 const glm::mat4 & Pipeline::GetMPTrans()
 {
+	GetModelTrans();
+	GetProjTrans();
+
+	mMP = mP * mM;
+	return mMP;
 }
 
 const glm::mat4 & Pipeline::GetMVTrans()
 {
-	// TODO: insert return statement here
+	GetModelTrans();
+	GetViewTrans();
+
+	mMV = mV * mM;
+	return mMV;
 }
 
 const glm::mat4 & Pipeline::GetVPTrans()
 {
-	// TODO: insert return statement here
+	GetViewTrans();
+	GetProjTrans();
+	mVP = mP * mV;
+	return mVP;
 }
 
 const glm::mat4 & Pipeline::GetMVPTrans()
 {
-	// TODO: insert return statement here
+	GetModelTrans();
+	GetVPTrans();
+	mMVP = mVP * mM;
+	return mMVP;
 }
 
 const glm::mat4 & Pipeline::GetMVOrthoPTrans()
 {
-	// TODO: insert return statement here
+	GetModelTrans();
+	GetViewTrans();
+
+	glm::mat4 P = InitOrthoProjTransform(mOrthoProjInfo);
+	mMVP = P * mV * mM;
+	return mMVP;
 }
 
 const glm::mat4 & Pipeline::GetModelTrans()
 {
-	// TODO: insert return statement here
+	glm::mat4 M;
+	glm::scale(M, mScale);
+	glm::rotate(M, mRotateInfo.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::rotate(M, mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::rotate(M, mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::translate(M, mWorldPos);
+	mM = M;
+	return mM;
 }
 
 const glm::mat4 & Pipeline::GetViewTrans()
 {
-	// TODO: insert return statement here
+	glm::mat4 V;
+	glm::rotate(V, -mCamera.Up.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::rotate(V, -mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::rotate(V, -mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	glm::translate(V, -mCamera.Pos);
+	mV = V;
+	return mV;
 }
 
 const glm::mat4 & Pipeline::GetProjTrans()
 {
-	// TODO: insert return statement here
+	mP = InitPersProjTransform(mPersProjInfo);
+	return mP;
 }

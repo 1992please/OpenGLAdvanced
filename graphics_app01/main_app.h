@@ -35,7 +35,7 @@ public:
 	void Run();
 	void RenderScene_callback() override;
 	void Keyboard_callback(KEY key, KEY_STATE keyState = KEY_STATE_PRESS) override;
-
+	void PassiveMouse_callback(int x, int y) override;
 private:
 	void CreateVertexBuffer()
 	{
@@ -69,6 +69,22 @@ private:
 	float m_scale;
 	DirectionalLight m_directionalLight;
 	PersProjInfo m_persProjInfo;
+};
+
+class TestApp :public ICallbacks, public GraphicsApp
+{
+public:
+	TestApp();
+	~TestApp();
+	bool Init();
+	void Run();
+	void RenderScene_callback() override;
+	void Keyboard_callback(KEY key, KEY_STATE keyState = KEY_STATE_PRESS) override;
+	void PassiveMouse_callback(int x, int y) override;
+private:
+
+	GLuint VBO;
+	GLuint VAO;
 };
 
 #endif // !MAIN_APP_H
