@@ -4,6 +4,9 @@
 #include "keys.h"
 
 
+const float SPEED = 2.5f;
+const float SENSITIVTY = 0.1f;
+
 struct PersProjInfo
 {
 	float FOV;
@@ -26,8 +29,8 @@ class Camera
 public:
 	Camera(int WindowWidth, int WindowHeight);
 	Camera(int WindowWidth, int WindowHeight, const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3 Up);
-	bool OnKeyboard(KEY Key);
-	void OnMouse(int x, int y);
+	bool OnKeyboard(KEY Key, float deltaTime);
+	void OnMouse(float x, float y);
 	void OnRender();
 	inline const glm::vec3& GetPos() const{ return mPos; }
 	inline const glm::vec3& GetForward() const { return mForward; }
@@ -49,7 +52,8 @@ private:
 	float mYaw;
 	float mPitch;
 
-	glm::i32vec2 mMousePos;
+	glm::vec2 mMousePos;
+	bool bFirstMouseCB;
 };
 
 

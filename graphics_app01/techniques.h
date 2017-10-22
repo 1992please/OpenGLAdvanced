@@ -1,5 +1,5 @@
-#ifndef LIGHTING_TECHNIQUE_H
-#define	LIGHTING_TECHNIQUE_H
+#ifndef TECHNIQUES_H
+#define	TECHNIQUES_H
 #include "Technique.h"
 #include "lights_common.h"
 
@@ -19,5 +19,15 @@ private:
 	GLuint mDirLightAmbientIntensityLocation;
 };
 
+class CustomTechnique : public Technique
+{
+public:
+	CustomTechnique() {};
+	virtual bool Init();
+	void SetMVP(const glm::mat4& MVP);
+
+private:
+	GLuint mMVPLocation;
+};
 
 #endif // !LIGHTINGTECHNIQUE_H

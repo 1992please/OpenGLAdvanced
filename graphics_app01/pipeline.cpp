@@ -12,8 +12,8 @@ namespace
 		Result[0][0] = 1.0f / (aspect * tanHalfFovy);
 		Result[1][1] = 1.0f / (tanHalfFovy);
 		Result[2][2] = -(p.zFar + p.zNear) / (p.zFar - p.zNear);
-		Result[2][3] = -2.0f * p.zFar * p.zNear / (p.zFar - p.zNear);
-		Result[3][2] = -1.0;
+		Result[3][2] = -2.0f * p.zFar * p.zNear / (p.zFar - p.zNear);
+		Result[2][3] = -1.0;
 		return Result;
 	}
 
@@ -23,8 +23,30 @@ namespace
 		Result[0][0] = 1/ p.r;
 		Result[1][1] = 1/ p.t;
 		Result[2][2] = -2.0f /(p.f - p.n);
-		Result[2][3] = -(p.f + p.n) / (p.f - p.n);
+		Result[3][2] = -(p.f + p.n) / (p.f - p.n);
 		Result[3][3] = 1.0;
+		return Result;
+	}
+
+	glm::mat4 InitCameraTransform(const glm::vec3& Forward, const glm::vec3& Up, const glm::vec3 Pos)
+	{
+		glm::vec3 f = glm::normalize(Forward);
+		glm::vec3 u = glm::normalize(Up);
+		glm::vec3 s = glm::cross(f, u);
+
+		glm::mat4 Result(1);
+		Result[0][0] = s.x;
+		Result[1][0] = s.y;
+		Result[2][0] = s.z;
+		Result[0][1] = u.x;
+		Result[1][1] = u.y;
+		Result[2][1] = u.z;
+		Result[0][2] = -f.x;
+		Result[1][2] = -f.y;
+		Result[2][2] = -f.z;
+		Result[3][0] = -glm::dot(s, Pos);
+		Result[3][1] = -glm::dot(u, Pos);
+		Result[3][2] = glm::dot(f, Pos);
 		return Result;
 	}
 }
@@ -148,23 +170,19 @@ const glm::mat4 & Pipeline::GetMVOrthoPTrans()
 const glm::mat4 & Pipeline::GetModelTrans()
 {
 	glm::mat4 M;
-	glm::scale(M, mScale);
-	glm::rotate(M, mRotateInfo.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::rotate(M, mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::rotate(M, mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::translate(M, mWorldPos);
+	M = glm::scale(M, mScale);
+	M = glm::rotate(M, mRotateInfo.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	M = glm::rotate(M, mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	M = glm::rotate(M, mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
+	M = glm::translate(M, mWorldPos);
 	mM = M;
 	return mM;
 }
 
 const glm::mat4 & Pipeline::GetViewTrans()
 {
-	glm::mat4 V;
-	glm::rotate(V, -mCamera.Up.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	glm::rotate(V, -mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::rotate(V, -mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	glm::translate(V, -mCamera.Pos);
-	mV = V;
+	//mV = glm::lookAt(mCamera.Pos, mCamera.Pos + mCamera.Forward, mCamera.Up);
+	mV = InitCameraTransform(mCamera.Forward, mCamera.Up, mCamera.Pos);
 	return mV;
 }
 

@@ -1,5 +1,5 @@
 #include "util.h"
-#include "lighting_technique.h"
+#include "techniques.h"
 
 LightingTechnique::LightingTechnique()
 {
@@ -47,4 +47,29 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
 	glUniform3f(mDirLightColorLocation, Light.Color.x, Light.Color.y, Light.Color.z);
 	glUniform1f(mDirLightAmbientIntensityLocation, Light.AmbientIntensity);
+}
+
+bool CustomTechnique::Init()
+{
+	if (!Technique::Init()) {
+		return false;
+	}
+
+	if (!AddShader("shaders/shader.vs", "shaders/shader.fs")) {
+		return false;
+	}
+
+	mMVPLocation = GetUniformLocation("MVP");
+
+	if (mMVPLocation == INVALID_UNIFORM_LOCATION)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void CustomTechnique::SetMVP(const glm::mat4 & MVP)
+{
+	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
 }

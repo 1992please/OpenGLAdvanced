@@ -70,6 +70,8 @@ static KEY GLFWKeyToOGLDEVKey(uint Key)
 			return KEY_F11;
 		case GLFW_KEY_F12:
 			return KEY_F12;
+		case GLFW_KEY_LEFT_ALT:
+			return KEY_UNDEFINED;
 		default:
 			ERROR_MESSAGE("Unimplemented OGLDEV key %d\n", Key);
 	}
@@ -93,16 +95,34 @@ static MOUSE GLFWMouseToOGLDEVMouse(uint Button)
 	return MOUSE_UNDEFINED;
 }
 
-static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
+//static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
+//{
+//	KEY OgldevKey = GLFWKeyToOGLDEVKey(key);
+//	KEY_STATE OgldevKeyState = (action == GLFW_PRESS) ? KEY_STATE_PRESS : KEY_STATE_RELEASE;
+//	s_pCallbacks->Keyboard_callback(OgldevKey);
+//}
+
+void processInput()
 {
-	KEY OgldevKey = GLFWKeyToOGLDEVKey(key);
-	KEY_STATE OgldevKeyState = (action == GLFW_PRESS) ? KEY_STATE_PRESS : KEY_STATE_RELEASE;
-	s_pCallbacks->Keyboard_callback(OgldevKey, OgldevKeyState);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_ESCAPE);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_W) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_W);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_S) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_S);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_E) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_E);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_Q) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_Q);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_A) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_A);
+	if (glfwGetKey(s_pWindow, GLFW_KEY_D) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_D);
 }
 
 static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
 {
-	s_pCallbacks->PassiveMouse_callback((int)x, (int)y);
+	s_pCallbacks->PassiveMouse_callback(x, y);
 }
 
 static void MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
@@ -120,7 +140,7 @@ static void MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int
 
 static void InitCallbacks()
 {
-	glfwSetKeyCallback(s_pWindow, KeyCallback);
+	//glfwSetKeyCallback(s_pWindow, KeyCallback);
 	glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
 	glfwSetMouseButtonCallback(s_pWindow, MouseButtonCallback);
 }
@@ -203,9 +223,12 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 
 	s_pCallbacks = pCallbacks;
 	InitCallbacks();
-
+	// Additional window configrations
+	glfwSetInputMode(s_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSwapInterval(-1);
 	while (!glfwWindowShouldClose(s_pWindow)) 
 	{
+		processInput();
 		s_pCallbacks->RenderScene_callback();
 		glfwSwapBuffers(s_pWindow);
 		glfwPollEvents();

@@ -13,11 +13,12 @@ protected:
 
 	float GetRunningTime();
 
+	__int32 mFps;
+	unsigned int mDeltaTime;
 private:
-	unsigned long mFrameTime;
-	unsigned long mStartTime;
-	int mFrameCount;
-	int mFps;
+	__int64 mTickCounter;
+	__int64 mPerfCounterFreq;
+	__int64 GetTickCounter();
 };
 
 

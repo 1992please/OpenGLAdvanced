@@ -17,13 +17,13 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="util.h" />
-    <ClInclude Include="Technique.h" />
-    <ClInclude Include="lighting_technique.h" />
     <ClInclude Include="main_app.h" />
     <ClInclude Include="basic_mesh.h" />
     <ClInclude Include="lights_common.h" />
     <ClInclude Include="pipeline.h" />
     <ClInclude Include="math_3d.h" />
+    <ClInclude Include="techniques.h" />
+    <ClInclude Include="technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
@@ -31,16 +31,20 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="glfw_backend.cpp" />
     <ClCompile Include="graphics_app.cpp" />
-    <ClCompile Include="Technique.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="util.cpp" />
-    <ClCompile Include="lighting_technique.cpp" />
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="basic_mesh.cpp" />
     <ClCompile Include="pipeline.cpp" />
+    <ClCompile Include="techniques.cpp" />
+    <ClCompile Include="technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\lighting.vs" />
     <None Include="shaders\lighting.fs" />
+    <None Include="shaders\shader.fs" />
+    <None Include="shaders\shader.vs" />
+    <None Include="shaders\colorful.vs" />
+    <None Include="shaders\colorful.fs" />
   </ItemGroup>
 </Project>

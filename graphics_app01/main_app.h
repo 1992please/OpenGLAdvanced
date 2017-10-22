@@ -6,7 +6,7 @@
 #include "callbacks.h"
 #include <GL\glew.h>
 #include "Texture.h"
-#include "lighting_technique.h"
+#include "techniques.h"
 #include "camera.h"
 
 #define WINDOW_WIDTH  1280  
@@ -34,57 +34,17 @@ public:
 	bool Init();
 	void Run();
 	void RenderScene_callback() override;
-	void Keyboard_callback(KEY key, KEY_STATE keyState = KEY_STATE_PRESS) override;
-	void PassiveMouse_callback(int x, int y) override;
+	void Keyboard_callback(KEY key) override;
+	void PassiveMouse_callback(float x, float y) override;
 private:
-	void CreateVertexBuffer()
-	{
-		Vertex Vertices[4] = { Vertex(glm::vec3(-1.0f, -1.0f, 0.5773f), glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(0.0f, -1.0f, -1.15475f), glm::vec2(0.5f, 0.0f)),
-			Vertex(glm::vec3(1.0f, -1.0f, 0.5773f),  glm::vec2(1.0f, 0.0f)),
-			Vertex(glm::vec3(0.0f, 1.0f, 0.0f),      glm::vec2(0.5f, 1.0f)) };
+	void CreateVertexBuffer();
 
-		glGenBuffers(1, &m_VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-	}
-
-	void CreateIndexBuffer()
-	{
-		unsigned int Indices[] = { 0, 3, 1,
-			1, 3, 2,
-			2, 3, 0,
-			1, 2, 0 };
-
-		glGenBuffers(1, &m_IBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
-	}
-
-	GLuint m_VBO;
-	GLuint m_IBO;
-	LightingTechnique* m_pEffect;
-	Texture* m_pTexture;
-	Camera* m_pGameCamera;
+	GLuint VBO , VAO;
+	CustomTechnique* Technique;
+	Camera* GameCamera;
 	float m_scale;
 	DirectionalLight m_directionalLight;
-	PersProjInfo m_persProjInfo;
-};
-
-class TestApp :public ICallbacks, public GraphicsApp
-{
-public:
-	TestApp();
-	~TestApp();
-	bool Init();
-	void Run();
-	void RenderScene_callback() override;
-	void Keyboard_callback(KEY key, KEY_STATE keyState = KEY_STATE_PRESS) override;
-	void PassiveMouse_callback(int x, int y) override;
-private:
-
-	GLuint VBO;
-	GLuint VAO;
+	PersProjInfo mPersProjInfo;
 };
 
 #endif // !MAIN_APP_H

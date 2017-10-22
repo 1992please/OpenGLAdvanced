@@ -6,8 +6,8 @@ class ICallbacks
 {
 public:
 
-	virtual void Keyboard_callback(KEY key, KEY_STATE keyState = KEY_STATE_PRESS) {};
-	virtual void PassiveMouse_callback(int x, int y) {};
+	virtual void Keyboard_callback(KEY key) {};
+	virtual void PassiveMouse_callback(float x, float y) {};
 	virtual void RenderScene_callback() {};
 	virtual void Mouse_callback(MOUSE button, KEY_STATE state, int x, int y) {};
 };

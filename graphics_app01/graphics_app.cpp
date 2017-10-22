@@ -2,26 +2,24 @@
 #include <Windows.h>
 
 
+
 GraphicsApp::GraphicsApp()
 {
-	mFrameCount = 0;
 	mFps = 0;
-
-	mFrameTime = mStartTime = GetTickCount();
+	LARGE_INTEGER PerformanceFrequencyResult;
+	QueryPerformanceFrequency(&PerformanceFrequencyResult);
+	mPerfCounterFreq = PerformanceFrequencyResult.QuadPart;
+	mTickCounter = GetTickCounter();
 }
 
 void GraphicsApp::CalcFPS()
 {
-	mFrameCount++;
+	const __int64 CurrentTickCounter = GetTickCounter();
+	const __int64 ElapsedTicks = CurrentTickCounter - mTickCounter;
+	mDeltaTime = (unsigned int) (ElapsedTicks * 1000) / mPerfCounterFreq;
+	mFps = mPerfCounterFreq / ElapsedTicks;
 
-	unsigned long time = GetTickCount();
-	if (time - mFrameTime >= 1000)
-	{
-		mFrameTime = time;
-		mFps = mFrameCount;
-		mFrameCount = 0;
-	}
-
+	mTickCounter = CurrentTickCounter;
 }
 
 void GraphicsApp::RenderFPS()
@@ -30,6 +28,12 @@ void GraphicsApp::RenderFPS()
 
 float GraphicsApp::GetRunningTime()
 {
-	float lRunningTime = ((float)(GetTickCount() - mStartTime)) / 1000.0f;
-	return lRunningTime;
+	return 0.0;
+}
+
+__int64 GraphicsApp::GetTickCounter()
+{
+	LARGE_INTEGER lCounter;
+	QueryPerformanceCounter(&lCounter);
+	return lCounter.QuadPart;
 }

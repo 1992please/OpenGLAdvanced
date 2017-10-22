@@ -1,18 +1,17 @@
 #include "camera.h"
+#include <math.h>
 
-const static float STEP_SCALE = 1.0f;
-const static int MARGIN = 10;
-const static float ROTATION_SCALE = .05f;
 const static glm::vec3 WORLD_UP(0.0f, 1.0f, 0.0f);
 
 Camera::Camera(int WindowWidth, int WindowHeight)
 {
 	mWindowWidth = WindowWidth;
 	mWindowHeight = WindowHeight;
-	mPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	mPos = glm::vec3(0.0f, 0.0f, -2.0f);
 	mForward = glm::vec3(0.0f, 0.0f, 1.0f);
 	mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	mRight = glm::vec3(1.0f, 0.0f, 0.0f);
+	bFirstMouseCB = true;
 	Init();
 }
 
@@ -27,51 +26,52 @@ Camera::Camera(int WindowWidth, int WindowHeight, const glm::vec3 & Pos, const g
 	Init();
 }
 
-bool Camera::OnKeyboard(KEY Key)
+bool Camera::OnKeyboard(KEY Key, float deltaTime)
 {
+	float velocity = SPEED * deltaTime;
 	bool lOut = false;
 	switch (Key)
 	{
 		case KEY_UP:
-		case KEY_w:
+		case KEY_W:
 		{
-			mPos += (mForward * STEP_SCALE);
+			mPos += (mForward * velocity);
 			lOut = true;
 		}
 		break;
 		case KEY_DOWN:
-		case KEY_s:
+		case KEY_S:
 		{
-			mPos -= (mForward * STEP_SCALE);
+			mPos -= (mForward * velocity);
 			lOut = true;
 		}
 		break;
 		case KEY_RIGHT:
-		case KEY_d:
+		case KEY_D:
 		{
-			mPos += mRight * STEP_SCALE;
+			mPos += mRight * velocity;
 			lOut = true;
 
 		}
 		break;
 		case KEY_LEFT:
-		case KEY_a:
+		case KEY_A:
 		{
-			mPos -= mRight * STEP_SCALE;
+			mPos -= mRight * velocity;
 			lOut = true;
 		}
 		break;
-		case KEY_e:
+		case KEY_E:
 		case KEY_PAGE_UP:
 		{
-			mPos.y += STEP_SCALE;
+			mPos.y += velocity;
 			lOut = true;
 		}
 		break;
-		case KEY_q:
+		case KEY_Q:
 		case KEY_PAGE_DOWN:
 		{
-			mPos.z -= STEP_SCALE;
+			mPos.y -= velocity;
 			lOut = true;
 		}
 		break;
@@ -82,16 +82,27 @@ bool Camera::OnKeyboard(KEY Key)
 	return lOut;
 }
 
-void Camera::OnMouse(int x, int y)
+void Camera::OnMouse(float x, float y)
 {
-	const int DeltaX = x - mMousePos.x;
-	const int DeltaY = y - mMousePos.y;
+	if (bFirstMouseCB)
+	{
+		mMousePos.x = x;
+		mMousePos.y = y;
+		bFirstMouseCB = false;
+	}
+	const float DeltaX = (x - mMousePos.x) * SENSITIVTY;
+	const float DeltaY = (mMousePos.y - y) * SENSITIVTY;
 
 	mMousePos.x = x;
 	mMousePos.y = y;
 
-	mYaw += (float)DeltaX * ROTATION_SCALE;
-	mPitch += (float)DeltaY * ROTATION_SCALE;
+	mYaw = std::fmod((mYaw + DeltaX), 360.0f);
+	mPitch += DeltaY;
+
+	if (mPitch > 89.0f)
+		mPitch = 89.0f;
+	if (mPitch < -89.0f)
+		mPitch = -89.0f;
 
 	Update();
 }
@@ -107,31 +118,28 @@ void Camera::Init()
 
 	if (HTarget.z >= 0.0f)
 	{
-		if (HTarget.x >= 0.0f)
+		if (HTarget.x > 0.0f)
 		{
-			mYaw = 360.0f - glm::degrees(asin(HTarget.z));
+			mYaw = glm::degrees(asin(HTarget.z));
 		}
 		else
 		{
-			mYaw = 180.0f + glm::degrees(asin(HTarget.z));
+			mYaw = 180 - glm::degrees(asin(HTarget.z));
 		}
 	}
 	else
 	{
-		if (HTarget.x > 0.0f)
+		if (HTarget.x >= 0.0f)
 		{
-			mYaw = glm::degrees(asin(-HTarget.z));
+			mYaw = 360.0f - glm::degrees(asin(-HTarget.z));
 		}
 		else
 		{
-			mYaw = 180 - glm::degrees(asin(-HTarget.z));
+			mYaw = 180.0f + glm::degrees(asin(-HTarget.z));
 		}
 	}
 
 	mPitch = -glm::degrees(asin(mForward.y));
-
-	mMousePos.x = mWindowWidth / 2;
-	mMousePos.y = mWindowHeight / 2;
 }
 
 void Camera::Update()
