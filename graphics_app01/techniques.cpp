@@ -33,7 +33,7 @@ bool LightingTechnique::Init()
 
 void LightingTechnique::SetMVP(const glm::mat4& MVP)
 {
-	glUniformMatrix4fv(mMVPLocation, 1, GL_TRUE, &MVP[0][0]);
+	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
 }
 
 
@@ -72,4 +72,36 @@ bool CustomTechnique::Init()
 void CustomTechnique::SetMVP(const glm::mat4 & MVP)
 {
 	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
+}
+
+bool UnlitTechnique::Init()
+{
+	if (!Technique::Init()) {
+		return false;
+	}
+
+	if (!AddShader("shaders/unlit.vs", "shaders/unlit.fs")) {
+		return false;
+	}
+
+	mMVPLocation = GetUniformLocation("MVP");
+	mSamplerLocation = GetUniformLocation("gSampler");
+
+	if (mMVPLocation == INVALID_UNIFORM_LOCATION ||
+		mSamplerLocation == INVALID_UNIFORM_LOCATION)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void UnlitTechnique::SetMVP(const glm::mat4 & MVP)
+{
+	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
+}
+
+void UnlitTechnique::SetTextureUnit(unsigned int TextureUnit)
+{
+	glUniform1i(mSamplerLocation, TextureUnit);
 }

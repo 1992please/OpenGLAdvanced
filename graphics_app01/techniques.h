@@ -19,6 +19,21 @@ private:
 	GLuint mDirLightAmbientIntensityLocation;
 };
 
+
+
+class UnlitTechnique : public Technique
+{
+public:
+	UnlitTechnique() {};
+	virtual bool Init();
+	void SetMVP(const glm::mat4& MVP);
+	void SetTextureUnit(unsigned int TextureUnit);
+
+private:
+	GLuint mMVPLocation;
+	GLuint mSamplerLocation;
+};
+
 class CustomTechnique : public Technique
 {
 public:
@@ -29,5 +44,6 @@ public:
 private:
 	GLuint mMVPLocation;
 };
+
 
 #endif // !LIGHTINGTECHNIQUE_H

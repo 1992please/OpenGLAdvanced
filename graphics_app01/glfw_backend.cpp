@@ -117,7 +117,11 @@ void processInput()
 	if (glfwGetKey(s_pWindow, GLFW_KEY_A) == GLFW_PRESS)
 		s_pCallbacks->Keyboard_callback(KEY_A);
 	if (glfwGetKey(s_pWindow, GLFW_KEY_D) == GLFW_PRESS)
-		s_pCallbacks->Keyboard_callback(KEY_D);
+		s_pCallbacks->Keyboard_callback(KEY_D);	
+	if (glfwGetKey(s_pWindow, GLFW_KEY_Z) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_Z);	
+	if (glfwGetKey(s_pWindow, GLFW_KEY_X) == GLFW_PRESS)
+		s_pCallbacks->Keyboard_callback(KEY_X);
 }
 
 static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)

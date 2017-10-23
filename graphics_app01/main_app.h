@@ -39,12 +39,13 @@ public:
 private:
 	void CreateVertexBuffer();
 
-	GLuint VBO , VAO;
-	CustomTechnique* Technique;
+	GLuint VBO, VAO, EBO;
+	LightingTechnique* Technique;
 	Camera* GameCamera;
 	float m_scale;
-	DirectionalLight m_directionalLight;
+	DirectionalLight mDirectionalLight;
 	PersProjInfo mPersProjInfo;
+	Texture* mTexture;
 };
 
 #endif // !MAIN_APP_H

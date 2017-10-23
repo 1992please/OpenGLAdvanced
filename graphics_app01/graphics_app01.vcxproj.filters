@@ -46,5 +46,7 @@
     <None Include="shaders\shader.vs" />
     <None Include="shaders\colorful.vs" />
     <None Include="shaders\colorful.fs" />
+    <None Include="shaders\unlit.fs" />
+    <None Include="shaders\unlit.vs" />
   </ItemGroup>
 </Project>

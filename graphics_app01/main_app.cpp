@@ -9,14 +9,15 @@ MainApp::MainApp()
 {
 	GameCamera = NULL;
 	Technique = NULL;
+	mTexture = NULL;
 	m_scale = 0.0f;
-	m_directionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_directionalLight.AmbientIntensity = 0.5f;
+	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	mDirectionalLight.AmbientIntensity = 0.5f;
 
 	mPersProjInfo.FOV = 60.0f;
 	mPersProjInfo.Height = WINDOW_HEIGHT;
 	mPersProjInfo.Width = WINDOW_WIDTH;
-	mPersProjInfo.zNear = 1.0f;
+	mPersProjInfo.zNear = .1f;
 	mPersProjInfo.zFar = 100.0f;
 }
 
@@ -24,6 +25,7 @@ MainApp::~MainApp()
 {
 	delete Technique;
 	delete GameCamera;
+	delete mTexture;
 }
 
 bool MainApp::Init()
@@ -32,14 +34,16 @@ bool MainApp::Init()
 
 	CreateVertexBuffer();
 
-	Technique = new CustomTechnique();
-
+	Technique = new LightingTechnique();
 	if (!Technique->Init())
 	{
 		return false;
 	}
-
 	Technique->Enable();
+	Technique->SetTextureUnit(0);
+
+	mTexture = new Texture(GL_TEXTURE_2D);
+	mTexture->Load("content/test.png");
 
 	return true;
 }
@@ -70,13 +74,15 @@ void MainApp::RenderScene_callback()
 	//glm::rotate(V, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 	Technique->SetMVP(p.GetMVPTrans());
+	Technique->SetDirectionalLight(mDirectionalLight);
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render the triangle
+	mTexture->Bind(0);
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 }
 
 void MainApp::Keyboard_callback(KEY key)
@@ -88,11 +94,11 @@ void MainApp::Keyboard_callback(KEY key)
 			break;
 
 		case KEY_Z:
-			m_directionalLight.AmbientIntensity += 0.05f;
+			mDirectionalLight.AmbientIntensity += 0.05f;
 			break;
 
 		case KEY_X:
-			m_directionalLight.AmbientIntensity -= 0.05f;
+			mDirectionalLight.AmbientIntensity -= 0.05f;
 			break;
 		default:
 			break;
@@ -107,16 +113,19 @@ void MainApp::PassiveMouse_callback(float x, float y)
 
 void MainApp::CreateVertexBuffer()
 {
-	float vertices[] = {
-		// positions         // colors
-		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+	Vertex vertices[] = { Vertex(glm::vec3(-1.0f, -1.0f, 0.5773f), glm::vec2(0.0f, 0.0f)),
+		Vertex(glm::vec3(0.0f, -1.0f, -1.15475f), glm::vec2(0.5f, 0.0f)),
+		Vertex(glm::vec3(1.0f, -1.0f, 0.5773f),  glm::vec2(1.0f, 0.0f)),
+		Vertex(glm::vec3(0.0f, 1.0f, 0.0f),      glm::vec2(0.5f, 1.0f)) };
 
-	};
+	unsigned int Indices[] = { 0, 3, 1,
+		1, 3, 2,
+		2, 3, 0,
+		1, 2, 0 };
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
 	glBindVertexArray(VAO);
 
@@ -124,9 +133,14 @@ void MainApp::CreateVertexBuffer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }
