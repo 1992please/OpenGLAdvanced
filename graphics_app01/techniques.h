@@ -9,14 +9,25 @@ public:
 	LightingTechnique();
 	virtual bool Init();
 	void SetMVP(const glm::mat4& MVP);
+	void SetWorldMatrix(const glm::mat4& WorldInverse);
 	void SetTextureUnit(unsigned int TextureUnit);
 	void SetDirectionalLight(const DirectionalLight& Light);
-
+	void SetEyeWorldPos(const glm::vec3& EyeWorldPos);
+	void SetMatSpecularIntensity(float Intensity);
+	void SetMatSpecularPower(float Power);
 private:
 	GLuint mMVPLocation;
+	GLuint mWorldMatrixLocation;
 	GLuint mSamplerLocation;
-	GLuint mDirLightColorLocation;
-	GLuint mDirLightAmbientIntensityLocation;
+	GLuint m_eyeWorldPosLocation;
+	GLuint m_matSpecularIntensityLocation;
+	GLuint m_matSpecularPowerLocation;
+	struct {
+		GLuint Color;
+		GLuint AmbientIntensity;
+		GLuint Direction;
+		GLuint DiffuseIntensity;
+	} m_dirLightLocation;
 };
 
 

@@ -6,7 +6,7 @@
 #include "callbacks.h"
 #include <GL\glew.h>
 #include "Texture.h"
-#include "techniques.h"
+#include "basic_lighting_technique.h"
 #include "camera.h"
 
 #define WINDOW_WIDTH  1280  
@@ -39,8 +39,8 @@ public:
 private:
 	void CreateVertexBuffer();
 
-	GLuint VBO, VAO, EBO;
-	LightingTechnique* Technique;
+	GLuint VBO, VAO;
+	BasicLightingTechnique* Technique;
 	Camera* GameCamera;
 	float m_scale;
 	DirectionalLight mDirectionalLight;

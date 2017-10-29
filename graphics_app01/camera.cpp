@@ -7,8 +7,8 @@ Camera::Camera(int WindowWidth, int WindowHeight)
 {
 	mWindowWidth = WindowWidth;
 	mWindowHeight = WindowHeight;
-	mPos = glm::vec3(0.0f, 0.0f, -2.0f);
-	mForward = glm::vec3(0.0f, 0.0f, 1.0f);
+	mPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	mForward = glm::vec3(0.0f, 0.0f, -1.0f);
 	mUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	mRight = glm::vec3(1.0f, 0.0f, 0.0f);
 	bFirstMouseCB = true;

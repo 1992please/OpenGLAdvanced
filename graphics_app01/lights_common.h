@@ -13,7 +13,7 @@ public:
 	BaseLight()
 	{
 		Color = glm::vec3(0.0f, 0.0f, 0.0f);
-		AmbientIntensity = 1.0f;
+		AmbientIntensity = 0.1f;
 		DiffuseIntensity = 0.0f;
 	}
 	// TODO add ant tweak bar

@@ -148,6 +148,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="basic_lighting_technique.h" />
     <ClInclude Include="basic_mesh.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="camera.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basic_lighting_technique.cpp" />
     <ClCompile Include="basic_mesh.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="FbxUtil.cpp" />
@@ -181,6 +183,8 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\basic_lighting.fs" />
+    <None Include="shaders\basic_lighting.vs" />
     <None Include="shaders\colorful.fs" />
     <None Include="shaders\colorful.vs" />
     <None Include="shaders\lighting.fs" />

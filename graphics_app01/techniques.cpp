@@ -15,15 +15,27 @@ bool LightingTechnique::Init()
 		return false;
 	}
 
-	mMVPLocation = GetUniformLocation("MVP");
+	mMVPLocation = GetUniformLocation("gMVP");
+	mWorldMatrixLocation = GetUniformLocation("gWorld");
 	mSamplerLocation = GetUniformLocation("gSampler");
-	mDirLightColorLocation = GetUniformLocation("gDirectionalLight.Color");
-	mDirLightAmbientIntensityLocation = GetUniformLocation("gDirectionalLight.AmbientIntensity");
+	m_dirLightLocation.Color = GetUniformLocation("gDirectionalLight.Color");
+	m_dirLightLocation.AmbientIntensity = GetUniformLocation("gDirectionalLight.AmbientIntensity");
+	m_dirLightLocation.Direction = GetUniformLocation("gDirectionalLight.Direction");
+	m_dirLightLocation.DiffuseIntensity = GetUniformLocation("gDirectionalLight.DiffuseIntensity");
+	m_eyeWorldPosLocation = GetUniformLocation("gEyeWorldPos");
+	m_matSpecularIntensityLocation = GetUniformLocation("gMatSpecularIntensity");
+	m_matSpecularPowerLocation = GetUniformLocation("gSpecularPower");
 
 	if (mMVPLocation == INVALID_UNIFORM_LOCATION ||
-		mSamplerLocation == INVALID_UNIFORM_LOCATION ||
-		mDirLightColorLocation == INVALID_UNIFORM_LOCATION ||
-		mDirLightAmbientIntensityLocation == INVALID_UNIFORM_LOCATION)
+		mWorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
+		m_dirLightLocation.Color == INVALID_UNIFORM_LOCATION ||
+		m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
+		m_dirLightLocation.Direction == INVALID_UNIFORM_LOCATION ||
+		m_dirLightLocation.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
+		m_eyeWorldPosLocation == INVALID_UNIFORM_LOCATION ||
+		m_matSpecularIntensityLocation == INVALID_UNIFORM_LOCATION ||
+		m_matSpecularPowerLocation == INVALID_UNIFORM_LOCATION ||
+		mSamplerLocation == INVALID_UNIFORM_LOCATION)
 	{
 		return false;
 	}
@@ -43,10 +55,33 @@ void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 }
 
 
+void LightingTechnique::SetWorldMatrix(const glm::mat4& Worldmat)
+{
+	glUniformMatrix4fv(mWorldMatrixLocation, 1, GL_FALSE, &Worldmat[0][0]);
+}
+
 void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
-	glUniform3f(mDirLightColorLocation, Light.Color.x, Light.Color.y, Light.Color.z);
-	glUniform1f(mDirLightAmbientIntensityLocation, Light.AmbientIntensity);
+	glUniform3f(m_dirLightLocation.Color, Light.Color.x, Light.Color.y, Light.Color.z);
+	glUniform1f(m_dirLightLocation.AmbientIntensity, Light.AmbientIntensity);
+	glm::vec3 Direction = glm::normalize(Light.Direction);
+	glUniform3f(m_dirLightLocation.Direction, Direction.x, Direction.y, Direction.z);
+	glUniform1f(m_dirLightLocation.DiffuseIntensity, Light.DiffuseIntensity);
+}
+
+void LightingTechnique::SetEyeWorldPos(const glm::vec3& EyeWorldPos)
+{
+	glUniform3f(m_eyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);
+}
+
+void LightingTechnique::SetMatSpecularIntensity(float Intensity)
+{
+	glUniform1f(m_matSpecularIntensityLocation, Intensity);
+}
+
+void LightingTechnique::SetMatSpecularPower(float Power)
+{
+	glUniform1f(m_matSpecularPowerLocation, Power);
 }
 
 bool CustomTechnique::Init()

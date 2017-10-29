@@ -24,6 +24,7 @@
     <ClInclude Include="math_3d.h" />
     <ClInclude Include="techniques.h" />
     <ClInclude Include="technique.h" />
+    <ClInclude Include="basic_lighting_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="techniques.cpp" />
     <ClCompile Include="technique.cpp" />
+    <ClCompile Include="basic_lighting_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\lighting.vs" />
@@ -48,5 +50,7 @@
     <None Include="shaders\colorful.fs" />
     <None Include="shaders\unlit.fs" />
     <None Include="shaders\unlit.vs" />
+    <None Include="shaders\basic_lighting.vs" />
+    <None Include="shaders\basic_lighting.fs" />
   </ItemGroup>
 </Project>
