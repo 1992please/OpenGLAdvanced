@@ -35,7 +35,8 @@ bool MainApp::Init()
 	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	CreateVertexBuffer();
-
+	Mesh = new BasicMesh();
+	Mesh->LoadMesh("C:/Users/Nader/Desktop/ColorCube.fbx");
 	Technique = new BasicLightingTechnique();
 	if (!Technique->Init())
 	{

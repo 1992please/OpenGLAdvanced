@@ -1,8 +1,8 @@
+#include "util.h"
 #include <Windows.h>
 #include <GL\glew.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "util.h"
 #include "glfw_backend.h"
 
 static ICallbacks* s_pCallbacks = NULL;
@@ -126,7 +126,7 @@ void processInput()
 
 static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
 {
-	s_pCallbacks->PassiveMouse_callback(x, y);
+	s_pCallbacks->PassiveMouse_callback((float)x, (float)y);
 }
 
 static void MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)

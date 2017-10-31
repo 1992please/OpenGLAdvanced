@@ -8,23 +8,10 @@
 #include "Texture.h"
 #include "basic_lighting_technique.h"
 #include "camera.h"
+#include "basic_mesh.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
-
-struct Vertex
-{
-	glm::vec3 m_pos;
-	glm::vec2 m_tex;
-
-	Vertex() {}
-
-	Vertex(glm::vec3 pos, glm::vec2 tex)
-	{
-		m_pos = pos;
-		m_tex = tex;
-	}
-};
 
 class MainApp :public ICallbacks, public GraphicsApp
 {
@@ -46,6 +33,7 @@ private:
 	DirectionalLight mDirectionalLight;
 	PersProjInfo mPersProjInfo;
 	Texture* mTexture;
+	BasicMesh* Mesh;
 };
 
 #endif // !MAIN_APP_H

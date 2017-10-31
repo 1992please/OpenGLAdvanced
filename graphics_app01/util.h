@@ -18,5 +18,7 @@ void ErrorMessage(const char* pFileName, uint line, const char* msg, ...);
 
 #define INVALID_UNIFORM_LOCATION 0xffffffff
 
+#define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
+
 #endif // !UTIL_H
 

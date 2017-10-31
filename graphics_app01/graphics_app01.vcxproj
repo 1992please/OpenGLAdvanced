@@ -156,6 +156,7 @@
     <ClInclude Include="glfw_backend.h" />
     <ClInclude Include="graphics_app.h" />
     <ClInclude Include="keys.h" />
+    <ClInclude Include="material.h" />
     <ClInclude Include="techniques.h" />
     <ClInclude Include="main_app.h" />
     <ClInclude Include="lights_common.h" />
@@ -163,7 +164,7 @@
     <ClInclude Include="pipeline.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="technique.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="texture.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
@@ -174,12 +175,13 @@
     <ClCompile Include="FbxUtil.cpp" />
     <ClCompile Include="glfw_backend.cpp" />
     <ClCompile Include="graphics_app.cpp" />
+    <ClCompile Include="material.cpp" />
     <ClCompile Include="techniques.cpp" />
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="technique.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="texture.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

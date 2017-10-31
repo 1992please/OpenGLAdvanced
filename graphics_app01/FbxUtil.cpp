@@ -1,7 +1,4 @@
-#include <fbxsdk.h>
-#include "Texture.h"
 #include "FbxUtil.h"
-
 namespace
 {
 	const int TRIANGLE_VERTEX_COUNT = 3;
@@ -51,36 +48,42 @@ namespace
 			if (lFileTexture && !lFileTexture->GetUserDataPtr())
 			{
 				// Try to load the texture from absolute path
-				FbxString lFileName = lFileTexture->GetFileName();
+				const FbxString lFileName = lFileTexture->GetFileName();
+				FbxString lResolvedFileName = lFileName;
 
-				Texture* lTextureObj = new Texture(GL_TEXTURE_2D);
-				bool bLoaded = lTextureObj->Load(lFileName.Buffer());
 
 				const FbxString lAbsFbxFileName = FbxPathUtils::Resolve(pFileName);
 				const FbxString lAbsFolderName = FbxPathUtils::GetFolderName(lAbsFbxFileName);
 
-				if (!bLoaded)
+
+				bool bExist = FbxFileUtils::Exist(lResolvedFileName);
+				if (!bExist)
 				{
 					// Load texture from relative file name (relative to FBX file)
-					const FbxString lResolvedFileName = FbxPathUtils::Bind(lAbsFolderName, lFileTexture->GetRelativeFileName());
-					bLoaded = lTextureObj->Load(lResolvedFileName);
+					lResolvedFileName = FbxPathUtils::Bind(lAbsFolderName, lFileTexture->GetRelativeFileName());
+					bExist = FbxFileUtils::Exist(lResolvedFileName);
+					
 				}
 
-				if (!bLoaded)
+				if (!bExist)
 				{
 					// Load texture from file name only (relative to FBX file)
 					const FbxString lTextureFileName = FbxPathUtils::GetFileName(lFileName);
-					const FbxString lResolvedFileName = FbxPathUtils::Bind(lAbsFolderName, lTextureFileName);
-					bLoaded = lTextureObj->Load(lResolvedFileName);
+					lResolvedFileName = FbxPathUtils::Bind(lAbsFolderName, lTextureFileName);
+					bExist = FbxFileUtils::Exist(lResolvedFileName);
 				}
 
-				if (!bLoaded)
+				if (bExist)
+				{
+					FbxString* FinalPath = new FbxString();
+					*FinalPath = lResolvedFileName;
+					lFileTexture->SetUserDataPtr(FinalPath);
+				}
+				else
 				{
 					fprintf(stderr, "Failed to load texture file: %s\n", lFileName.Buffer());
-					continue;
 				}
 
-				lFileTexture->SetUserDataPtr(lTextureObj);
 			}
 		}
 	}
@@ -94,18 +97,17 @@ namespace
 			FbxFileTexture * lFileTexture = FbxCast<FbxFileTexture>(lTexture);
 			if (lFileTexture && lFileTexture->GetUserDataPtr())
 			{
-				Texture * lTextureObj = static_cast<Texture *>(lFileTexture->GetUserDataPtr());
+				FbxString* TexturePath = static_cast<FbxString *>(lFileTexture->GetUserDataPtr());
 				lFileTexture->SetUserDataPtr(NULL);
-				delete lTextureObj;
+				delete TexturePath;
 			}
 		}
 	}
 
-	void DestroySdkObjects(FbxManager* pManager, bool pExitStatus)
+	void DestroySdkObjects(FbxManager* pManager)
 	{
 		//Delete the FBX Manager. All the objects that have been allocated using the FBX Manager and that haven't been explicitly destroyed are also automatically destroyed.
 		if (pManager) pManager->Destroy();
-		if (pExitStatus) fprintf(stdout, "Program Success!\n");
 	}
 
 	void FillMeshArrayRecursive(FbxNode* pNode, std::vector<FbxNode*>& pMeshArray)
@@ -134,45 +136,49 @@ namespace
 	}
 }
 
-FMaterial::FMaterial()
+CachedMaterial::CachedMaterial()
 {
 }
 
-FMaterial::FMaterial(const FbxSurfaceMaterial* pMaterial)
+CachedMaterial::CachedMaterial(const FbxSurfaceMaterial* pMaterial)
 {
 	const FbxDouble3 lEmissive = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, &mEmissive.mTexture);
-	mEmissive.mColor[0] = static_cast<GLfloat>(lEmissive[0]);
-	mEmissive.mColor[1] = static_cast<GLfloat>(lEmissive[1]);
-	mEmissive.mColor[2] = static_cast<GLfloat>(lEmissive[2]);
+		FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, mEmissive.TexturePath);
+	mEmissive.mColor[0] = static_cast<float>(lEmissive[0]);
+	mEmissive.mColor[1] = static_cast<float>(lEmissive[1]);
+	mEmissive.mColor[2] = static_cast<float>(lEmissive[2]);
 
 	const FbxDouble3 lAmbient = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, &mAmbient.mTexture);
-	mAmbient.mColor[0] = static_cast<GLfloat>(lAmbient[0]);
-	mAmbient.mColor[1] = static_cast<GLfloat>(lAmbient[1]);
-	mAmbient.mColor[2] = static_cast<GLfloat>(lAmbient[2]);
+		FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, mAmbient.TexturePath);
+	mAmbient.mColor[0] = static_cast<float>(lAmbient[0]);
+	mAmbient.mColor[1] = static_cast<float>(lAmbient[1]);
+	mAmbient.mColor[2] = static_cast<float>(lAmbient[2]);
 
 	const FbxDouble3 lDiffuse = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, &mDiffuse.mTexture);
-	mDiffuse.mColor[0] = static_cast<GLfloat>(lDiffuse[0]);
-	mDiffuse.mColor[1] = static_cast<GLfloat>(lDiffuse[1]);
-	mDiffuse.mColor[2] = static_cast<GLfloat>(lDiffuse[2]);
+		FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, mDiffuse.TexturePath);
+	mDiffuse.mColor[0] = static_cast<float>(lDiffuse[0]);
+	mDiffuse.mColor[1] = static_cast<float>(lDiffuse[1]);
+	mDiffuse.mColor[2] = static_cast<float>(lDiffuse[2]);
 
 	const FbxDouble3 lSpecular = GetMaterialProperty(pMaterial,
-		FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, &mSpecular.mTexture);
-	mSpecular.mColor[0] = static_cast<GLfloat>(lSpecular[0]);
-	mSpecular.mColor[1] = static_cast<GLfloat>(lSpecular[1]);
-	mSpecular.mColor[2] = static_cast<GLfloat>(lSpecular[2]);
+		FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, mSpecular.TexturePath);
+	mSpecular.mColor[0] = static_cast<float>(lSpecular[0]);
+	mSpecular.mColor[1] = static_cast<float>(lSpecular[1]);
+	mSpecular.mColor[2] = static_cast<float>(lSpecular[2]);
 
 	FbxProperty lShininessProperty = pMaterial->FindProperty(FbxSurfaceMaterial::sShininess);
 	if (lShininessProperty.IsValid())
 	{
 		double lShininess = lShininessProperty.Get<FbxDouble>();
-		mShinness = static_cast<GLfloat>(lShininess);
+		mShinness = static_cast<float>(lShininess);
 	}
 }
 
-FbxDouble3 FMaterial::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, const char * pPropertyName, const char * pFactorPropertyName, Texture** pTexture)
+FbxDouble3 CachedMaterial::GetMaterialProperty(
+	const FbxSurfaceMaterial * pMaterial,
+	const char * pPropertyName,
+	const char * pFactorPropertyName, 
+	char*& pTextureName)
 {
 	FbxDouble3 lResult(0, 0, 0);
 	const FbxProperty lProperty = pMaterial->FindProperty(pPropertyName);
@@ -197,7 +203,7 @@ FbxDouble3 FMaterial::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, 
 			const FbxFileTexture* lTexture = lProperty.GetSrcObject<FbxFileTexture>();
 			if (lTexture && lTexture->GetUserDataPtr())
 			{
-				*pTexture = static_cast<Texture *>(lTexture->GetUserDataPtr());
+				pTextureName = static_cast<FbxString *>(lTexture->GetUserDataPtr())->Buffer();
 			}
 		}
 	}
@@ -205,15 +211,30 @@ FbxDouble3 FMaterial::GetMaterialProperty(const FbxSurfaceMaterial * pMaterial, 
 	return lResult;
 }
 
-FMaterial::~FMaterial()
+CachedMaterial::~CachedMaterial()
 {
 }
 
 FbxUtil::FbxUtil(const char * pFileName)
 	: mFileName(pFileName), mSdkManager(NULL), mScene(NULL), mImporter(NULL)
 {
+
+}
+
+FbxUtil::~FbxUtil()
+{
+	mMeshNodes.clear();
+
+	DestroySdkObjects(mSdkManager);
+}
+
+bool FbxUtil::Init()
+{
 	if (mFileName == NULL)
+	{
 		fprintf(stderr, "No file name supplied.");
+		return false;
+	}
 
 	// Create the FBX SDK manager which is the object allocator for almost 
 	// all the classes in the SDK and create the scene.
@@ -238,84 +259,75 @@ FbxUtil::FbxUtil(const char * pFileName)
 		else
 		{
 			fprintf(stderr, "Unable to open file\n");
+			return false;
 		}
 	}
 	else
 	{
 		fprintf(stderr, "Unable to create the FBX SDK manager\n");
+		return false;
 	}
-}
-
-FbxUtil::~FbxUtil()
-{
-	mMeshNodes.clear();
-	// Unload the cache and free the memory
-	if (mScene)
-	{
-		UnLoadCacheTextures(mScene);
-	}
-
-	// Delete the FBX SDK manager. All the objects that have been allocated 
-	// using the FBX SDK manager and that haven't been explicitly destroyed 
-	// are automatically destroyed at the same time.
-	DestroySdkObjects(mSdkManager, true);
+	return true;
 }
 
 bool FbxUtil::load()
 {
-	if (mImporter->Import(mScene))
+	if (Init())
 	{
-		// Convert Axis System to what is used in this example, if needed
-		FbxAxisSystem SceneAxisSystem = mScene->GetGlobalSettings().GetAxisSystem();
-		FbxAxisSystem OurAxisSystem(FbxAxisSystem::eYAxis, FbxAxisSystem::eParityOdd, FbxAxisSystem::eRightHanded);
-		if (SceneAxisSystem != OurAxisSystem)
+		if (mImporter->Import(mScene))
 		{
-			OurAxisSystem.ConvertScene(mScene);
+			// Convert Axis System to what is used in this example, if needed
+			FbxAxisSystem SceneAxisSystem = mScene->GetGlobalSettings().GetAxisSystem();
+			FbxAxisSystem OurAxisSystem(FbxAxisSystem::eYAxis, FbxAxisSystem::eParityOdd, FbxAxisSystem::eRightHanded);
+			if (SceneAxisSystem != OurAxisSystem)
+			{
+				OurAxisSystem.ConvertScene(mScene);
+			}
+
+			// Convert Unit System to what is used in this example, if needed
+			FbxSystemUnit SceneSystemUnit = mScene->GetGlobalSettings().GetSystemUnit();
+			if (SceneSystemUnit.GetScaleFactor() != 1.0)
+			{
+				//The unit in this example is centimeter.
+				FbxSystemUnit::cm.ConvertScene(mScene);
+			}
+
+			// Convert mesh, NURBS and patch into triangle mesh
+			FbxGeometryConverter lGeomConverter(mSdkManager);
+			lGeomConverter.Triangulate(mScene, true);
+
+			// Bake the scene for one frame
+			LoadCacheTextures(mScene, mFileName);
+			FillMeshArray(mScene->GetRootNode(), mMeshNodes);
 		}
-
-		// Convert Unit System to what is used in this example, if needed
-		FbxSystemUnit SceneSystemUnit = mScene->GetGlobalSettings().GetSystemUnit();
-		if (SceneSystemUnit.GetScaleFactor() != 1.0)
-		{
-			//The unit in this example is centimeter.
-			FbxSystemUnit::cm.ConvertScene(mScene);
-		}
-
-		// Convert mesh, NURBS and patch into triangle mesh
-		FbxGeometryConverter lGeomConverter(mSdkManager);
-		lGeomConverter.Triangulate(mScene, true);
-
-		// Bake the scene for one frame
-		LoadCacheTextures(mScene, mFileName);
-		FillMeshArray(mScene->GetRootNode(), mMeshNodes);
 	}
 	return false;
 }
 
-void FbxUtil::GetStaticMeshes(std::vector<FStaticMesh*>& Meshes)
+void FbxUtil::GetStaticMeshes(std::vector<CachedMesh*>& Meshes)
 {
 	Meshes.clear();
 	const int lMeshCount = mMeshNodes.size();
 	Meshes.resize(lMeshCount);
 	for (int i = 0; i < lMeshCount; ++i)
 	{
-		FStaticMesh* lMesh = new FStaticMesh();
+		CachedMesh* lMesh = new CachedMesh();
 		if (GetStaticMeshInfo(mMeshNodes[i], lMesh))
 			Meshes[i] = lMesh;
 	}
 }
 
-void FbxUtil::GetStaticMesh(FStaticMesh * pMesh)
+void FbxUtil::GetStaticMesh(CachedMesh*& pMesh)
 {
 	if (mMeshNodes.size() >= 1)
 	{
-		FStaticMesh* lMesh = new FStaticMesh();
+		CachedMesh* lMesh = new CachedMesh();
 		if (GetStaticMeshInfo(mMeshNodes[0], lMesh))
 			pMesh = lMesh;
 	}
 }
 
-bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, FStaticMesh* _Mesh)
+bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, CachedMesh* _Mesh)
 {
 	// Meshes info----------------------------------------------------
 	if (!pNode)
@@ -412,7 +424,7 @@ bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, FStaticMesh* _Mesh)
 		lPolygonVertexCount = lPolygonCount * TRIANGLE_VERTEX_COUNT;
 	}
 	float* lVertices = new float[lPolygonVertexCount * VERTEX_STRIDE];
-	GLuint* lIndices = new GLuint[lPolygonCount * TRIANGLE_VERTEX_COUNT];
+	unsigned int* lIndices = new unsigned int[lPolygonCount * TRIANGLE_VERTEX_COUNT];
 
 	float* lNormals = NULL;
 	if (lHasNormal)
@@ -541,19 +553,19 @@ bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, FStaticMesh* _Mesh)
 	_Mesh->mIndices = lIndices;
 	_Mesh->mNormals = lNormals;
 	_Mesh->mUVs = lUVs;
-	_Mesh->mVertexCount = lPolygonVertexCount;
+	_Mesh->mPolygonVertexCount = lPolygonVertexCount;
 	_Mesh->mPolygonCount = lPolygonCount;
 
 	// Material info---------------------------------------------------
 
 	const int lMaterialCount = _Mesh->mSubMeshesCount;
-	_Mesh->mMaterials = new FMaterial*[lMaterialCount];
+	_Mesh->mMaterials = new CachedMaterial*[lMaterialCount];
 	for (int lMaterialIndex = 0; lMaterialIndex < lMaterialCount; ++lMaterialIndex)
 	{
 		FbxSurfaceMaterial * lMaterial = pNode->GetMaterial(lMaterialIndex);
 		if (lMaterial)
 		{
-			_Mesh->mMaterials[lMaterialIndex] = new FMaterial(lMaterial);
+			_Mesh->mMaterials[lMaterialIndex] = new CachedMaterial(lMaterial);
 		}
 	}
 
