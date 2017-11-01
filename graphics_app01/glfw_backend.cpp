@@ -177,13 +177,11 @@ void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 	printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
 }
 
-
 void GLFWBackendTerminate()
 {
 	glfwDestroyWindow(s_pWindow);
 	glfwTerminate();
 }
-
 
 bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle)
 {
@@ -210,6 +208,12 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
 		exit(1);
 	}
 
+	// get version info
+	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
+	const GLubyte* version = glGetString(GL_VERSION); // version as a string
+	printf("Renderer: %s\n", renderer);
+	printf("OpenGL version supported %s\n", version);
+
 	return (s_pWindow != NULL);
 }
 
@@ -231,7 +235,7 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 
 	s_pCallbacks = pCallbacks;
 	InitCallbacks();
-	// Additional window configrations
+	// Additional window configurations
 	glfwSetInputMode(s_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//glfwSwapInterval(-1);
 	while (!glfwWindowShouldClose(s_pWindow)) 

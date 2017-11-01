@@ -299,6 +299,7 @@ bool FbxUtil::load()
 			// Bake the scene for one frame
 			LoadCacheTextures(mScene, mFileName);
 			FillMeshArray(mScene->GetRootNode(), mMeshNodes);
+			return true;
 		}
 	}
 	return false;
@@ -317,14 +318,21 @@ void FbxUtil::GetStaticMeshes(std::vector<CachedMesh*>& Meshes)
 	}
 }
 
-void FbxUtil::GetStaticMesh(CachedMesh*& pMesh)
+bool FbxUtil::GetStaticMesh(CachedMesh*& pMesh)
 {
 	if (mMeshNodes.size() >= 1)
 	{
-		CachedMesh* lMesh = new CachedMesh();
-		if (GetStaticMeshInfo(mMeshNodes[0], lMesh))
-			pMesh = lMesh;
+		pMesh = new CachedMesh();
+		if (GetStaticMeshInfo(mMeshNodes[0], pMesh))
+			return true;
+		return false;
 	}
+}
+
+void FbxUtil::DeAlocate(CachedMesh* pMesh)
+{
+	delete pMesh;
+	pMesh = NULL;
 }
 
 bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, CachedMesh* _Mesh)
@@ -446,7 +454,7 @@ bool FbxUtil::GetStaticMeshInfo(FbxNode * pNode, CachedMesh* _Mesh)
 	FbxVector4 lCurrentVertex;
 	FbxVector4 lCurrentNormal;
 	FbxVector2 lCurrentUV;
-	// if it's indiced by vertexes
+	// if it's indexed by vertexes
 	if (lAllByControlPoint)
 	{
 		const FbxGeometryElementNormal * lNormalElement = NULL;

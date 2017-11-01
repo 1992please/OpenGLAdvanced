@@ -7,7 +7,8 @@ class Texture
 public:
 	Texture(GLenum Target);
 	bool Load(const char* FileName);
-	void Bind(unsigned int index);
+	void BindOffset(unsigned int index);
+	void Bind(GLenum index);
 	~Texture();
 
 private:

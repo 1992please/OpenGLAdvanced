@@ -5,6 +5,7 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
 #include "glm/ext.hpp"
+#include "engine_common.h"
 
 MainApp::MainApp()
 {
@@ -34,16 +35,16 @@ bool MainApp::Init()
 {
 	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	CreateVertexBuffer();
-	Mesh = new BasicMesh();
-	Mesh->LoadMesh("C:/Users/Nader/Desktop/ColorCube.fbx");
 	Technique = new BasicLightingTechnique();
 	if (!Technique->Init())
 	{
 		return false;
 	}
 	Technique->Enable();
-	Technique->SetColorTextureUnit(0);
+	Technique->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+
+	Mesh = new BasicMesh();
+	Mesh->LoadMesh("C:/Users/Nader/Desktop/nanosuit.fbx");
 
 	mTexture = new Texture(GL_TEXTURE_2D);
 	mTexture->Load("content/test.png");
@@ -101,10 +102,7 @@ void MainApp::RenderScene_callback()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render the triangle
-	mTexture->Bind(0);
-	glBindVertexArray(VAO);
-	//glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	Mesh->Render();
 }
 
 void MainApp::Keyboard_callback(KEY key)
@@ -131,74 +129,4 @@ void MainApp::Keyboard_callback(KEY key)
 void MainApp::PassiveMouse_callback(float x, float y)
 {
 	GameCamera->OnMouse(x, y);
-}
-
-void MainApp::CreateVertexBuffer()
-{
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,1.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,0.0f, 0.0f,
-
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,0.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,1.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,0.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,1.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,0.0f, 0.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,0.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
-	};
-
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	//glGenBuffers(1, &EBO);
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// position attribute
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-
-	// Normal attribute
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-
-	// UV Coords
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }

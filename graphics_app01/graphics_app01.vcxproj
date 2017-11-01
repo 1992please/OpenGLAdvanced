@@ -152,6 +152,7 @@
     <ClInclude Include="basic_mesh.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="engine_common.h" />
     <ClInclude Include="FbxUtil.h" />
     <ClInclude Include="glfw_backend.h" />
     <ClInclude Include="graphics_app.h" />

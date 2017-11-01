@@ -54,10 +54,16 @@ bool Texture::Load(const char* FileName)
 	return true;
 }
 
-void Texture::Bind(unsigned int index)
+void Texture::BindOffset(unsigned int index)
 {
 	assert(index < 32);
 	glActiveTexture(GL_TEXTURE0 + index);
+	glBindTexture(mTarget, mID);
+}
+
+void Texture::Bind(GLenum index)
+{
+	glActiveTexture(index);
 	glBindTexture(mTarget, mID);
 }
 

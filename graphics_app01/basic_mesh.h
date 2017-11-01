@@ -31,9 +31,8 @@ public:
 	bool LoadMesh(const char* Filename);
 
 	void Render();
+	void Render(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
 private:
-	void InitMesh();
-	bool InitFromCachedMesh(const CachedMesh* Mesh);
 	void Clear();
 
 	enum
@@ -56,8 +55,8 @@ private:
 			NumIndices = 0;
 			BaseIndex = 0;
 		}
-		unsigned int NumIndices;
-		unsigned int BaseIndex;
+		uint NumIndices;
+		uint BaseIndex;
 	};
 	std::vector<BasicMeshEntry> mMeshEntries;
 	std::vector<Material*> mMaterials;

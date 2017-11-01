@@ -408,10 +408,6 @@ Mesh::~Mesh()
 	delete[] mMaterials;
 }
 
-
-
-
-
 bool Mesh::InitializeSubMeshes(const FStaticMesh* lMesh)
 {
 	// just to continue the code

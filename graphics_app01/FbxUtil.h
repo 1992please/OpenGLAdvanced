@@ -83,8 +83,8 @@ public:
 
 	bool load();
 	void GetStaticMeshes(std::vector<CachedMesh*>& Meshes);
-	void GetStaticMesh(CachedMesh*& pMesh);
-	inline void DeAlocate(CachedMesh* pMesh){delete pMesh;}
+	bool GetStaticMesh(CachedMesh*& pMesh);
+	static void DeAlocate(CachedMesh* pMesh);
 private:
 	bool Init();
 	const char* mFileName;

@@ -24,9 +24,6 @@ public:
 	void Keyboard_callback(KEY key) override;
 	void PassiveMouse_callback(float x, float y) override;
 private:
-	void CreateVertexBuffer();
-
-	GLuint VBO, VAO;
 	BasicLightingTechnique* Technique;
 	Camera* GameCamera;
 	float m_scale;
