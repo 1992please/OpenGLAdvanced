@@ -4,7 +4,7 @@
 
 Material::Material()
 {
-	mSpecularPower = 32;
+	mShininess = .5f;
 	mSpecularIntensity = 0.0;
 }
 
@@ -14,18 +14,15 @@ Material::~Material()
 
 void Material::ColorChannel::LoadTexture(const char* TexPath)
 {
-	if (!TexPath)
-	{
-		return;
-	}
 	Texture* temp = new Texture(GL_TEXTURE_2D);
-	if (temp->Load(TexPath))
+	if (TexPath && temp->Load(TexPath))
 	{
 		mTexture = temp;
 	}
 	else
 	{
 		SAFE_DELETE(temp);
+		mTexture = new Texture();
 	}
 }
 
@@ -39,7 +36,7 @@ void Material::ColorChannel::LoadColor(float* Color)
 Material::ColorChannel::ColorChannel()
 {
 	mTexture = NULL;
-	mColor = glm::vec3(0.0, 0.0, 0.0);
+	mColor = glm::vec3(1.0, 1.0, 1.0);
 }
 
 Material::ColorChannel::~ColorChannel()

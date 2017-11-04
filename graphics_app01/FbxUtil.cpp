@@ -325,8 +325,8 @@ bool FbxUtil::GetStaticMesh(CachedMesh*& pMesh)
 		pMesh = new CachedMesh();
 		if (GetStaticMeshInfo(mMeshNodes[0], pMesh))
 			return true;
-		return false;
 	}
+	return false;
 }
 
 void FbxUtil::DeAlocate(CachedMesh* pMesh)

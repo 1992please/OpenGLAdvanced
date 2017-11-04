@@ -5,9 +5,33 @@
 #include <iostream>
 #include "Texture.h"
 
+
+
 Texture::Texture(GLenum Target)
 {
 	mTarget = Target;
+}
+
+Texture::Texture()
+{
+	mTarget = GL_TEXTURE_2D;
+
+	int width = 2;
+	int height = 2;
+	GLenum format = GL_RGB;
+	float data[] = {
+		1, 1, 1,
+		1, 1, 1,
+		1, 1, 1,
+		1, 1, 1};
+	glGenTextures(1, &mID);
+	glBindTexture(mTarget, mID);
+	glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(mTarget, 0, GL_RGB, width, height, 0, format, GL_FLOAT, data);
+	glBindTexture(mTarget, 0);
 }
 
 bool Texture::Load(const char* FileName)

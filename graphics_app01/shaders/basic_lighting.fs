@@ -9,6 +9,19 @@ in vec3 WorldPos0;
 
 out vec4 FragColor;
 
+struct ColorChannel
+{
+	sampler2D Tex;
+	vec3 Color;
+};
+
+struct Material
+{
+	ColorChannel Diffuse;
+	float SpecularIntensity;
+	float Shininess;
+};
+
 struct BaseLight
 {
     vec3 Color;
@@ -48,10 +61,8 @@ uniform int gNumSpotLights;
 uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
-uniform sampler2D gColorMap;
+uniform Material gMaterial;
 uniform vec3 gEyeWorldPos;
-uniform float gMatSpecularIntensity;
-uniform float gSpecularPower;
 
 vec3 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
@@ -69,8 +80,8 @@ vec3 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
     float SpecularFactor = dot(ViewDirection, LightReflect);
     if(SpecularFactor > 0)
     {
-        SpecularFactor = pow(SpecularFactor, gSpecularPower);
-        SpecularColorRatio =  gMatSpecularIntensity * SpecularFactor ;
+        SpecularFactor = pow(SpecularFactor, gMaterial.Shininess);
+        SpecularColorRatio =  gMaterial.SpecularIntensity * SpecularFactor ;
     }
 
     return Light.Color * (AmbientColorRatio + DiffuseColorRatio + SpecularColorRatio);
@@ -125,5 +136,7 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    FragColor = texture(gColorMap, TexCoord0.xy) * vec4(TotalLight, 1.0);
+    vec4 DiffuseColor = texture(gMaterial.Diffuse.Tex, TexCoord0) * vec4(gMaterial.Diffuse.Color, 1.0);
+
+    FragColor =  DiffuseColor * vec4(TotalLight, 1.0);
 }

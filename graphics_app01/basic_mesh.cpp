@@ -126,13 +126,14 @@ bool BasicMesh::LoadMesh(const char* Filename)
 	return Ret;
 }
 
-void BasicMesh::Render()
+void BasicMesh::Render(BasicLightingTechnique* Technique)
 {
 	glBindVertexArray(mVAO);
 
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
 		mMaterials[i]->mDiffuse.mTexture->Bind(COLOR_TEXTURE_UNIT);
+		Technique->SetMaterial(mMaterials[i]);
 		glDrawElements(
 			GL_TRIANGLES,
 			mMeshEntries[i].NumIndices,

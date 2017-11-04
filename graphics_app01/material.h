@@ -23,7 +23,7 @@ public:
 	ColorChannel mDiffuse;
 	ColorChannel mSpecular;
 	float mSpecularIntensity;
-	float mSpecularPower;
+	float mShininess;
 };
 
 

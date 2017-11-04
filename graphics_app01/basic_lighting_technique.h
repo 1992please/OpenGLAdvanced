@@ -2,6 +2,7 @@
 
 #include "technique.h"
 #include "lights_common.h"
+#include "material.h"
 
 class BasicLightingTechnique : public Technique
 {
@@ -20,24 +21,29 @@ public:
 	void SetPointLights(unsigned int NumLights, const PointLight* pLights);
 	void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
 	void SetEyeWorldPos(const glm::vec3& EyeWorldPos);
-	void SetMatSpecularIntensity(float Intensity);
-	void SetMatSpecularPower(float Power);
+	void SetMaterial(Material* mat);
 private:
 	GLuint mMVPLocation;
-	GLuint m_WorldMatrixLocation;
-	GLuint m_colorTextureLocation;
-	GLuint m_eyeWorldPosLocation;
-	GLuint m_matSpecularIntensityLocation;
-	GLuint m_matSpecularPowerLocation;
-	GLuint m_numPointLightsLocation;
-	GLuint m_numSpotLightsLocation;
+	GLuint mWorldMatrixLocation;
+	GLuint mEyeWorldPosLocation;
+	GLuint mNumPointLightsLocation;
+	GLuint mNumSpotLightsLocation;
+
+	struct {
+		struct{
+			GLuint TexLocation;
+			GLuint Color;
+		}Diffuse;
+		GLuint SpecularIntensity;
+		GLuint Shininess;
+	}mMaterial;
 
 	struct {
 		GLuint Color;
 		GLuint AmbientIntensity;
 		GLuint DiffuseIntensity;
 		GLuint Direction;
-	} m_dirLightLocation;
+	} mDirLightLocation;
 
 	struct {
 		GLuint Color;
@@ -49,7 +55,7 @@ private:
 			GLuint Linear;
 			GLuint Exp;
 		} Atten;
-	} m_pointLightsLocation[MAX_POINT_LIGHTS];
+	} mPointLightsLocation[MAX_POINT_LIGHTS];
 
 	struct {
 		GLuint Color;
@@ -63,5 +69,5 @@ private:
 			GLuint Linear;
 			GLuint Exp;
 		} Atten;
-	} m_spotLightsLocation[MAX_SPOT_LIGHTS];
+	} mSpotLightsLocation[MAX_SPOT_LIGHTS];
 };
