@@ -1,6 +1,7 @@
 
 #include "basic_lighting_technique.h"
 #include "util.h"
+#include "engine_common.h"
 
 BasicLightingTechnique::BasicLightingTechnique()
 {
@@ -19,8 +20,9 @@ bool BasicLightingTechnique::Init()
 	mMVPLocation = GetUniformLocation("gWVP");
 	mWorldMatrixLocation = GetUniformLocation("gWorld");
 	mMaterial.Diffuse.TexLocation = GetUniformLocation("gMaterial.Diffuse.Tex");
+	mMaterial.Specular.TexLocation = GetUniformLocation("gMaterial.Specular.Tex");
 	mMaterial.Diffuse.Color = GetUniformLocation("gMaterial.Diffuse.Color");
-	mMaterial.SpecularIntensity = GetUniformLocation("gMaterial.SpecularIntensity");
+	mMaterial.Specular.Color = GetUniformLocation("gMaterial.Specular.Color");
 	mMaterial.Shininess = GetUniformLocation("gMaterial.Shininess");
 	mEyeWorldPosLocation = GetUniformLocation("gEyeWorldPos");
 	mDirLightLocation.Color = GetUniformLocation("gDirectionalLight.Base.Color");
@@ -33,12 +35,14 @@ bool BasicLightingTechnique::Init()
 	if (mDirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
 		mMVPLocation == INVALID_UNIFORM_LOCATION ||
 		mWorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
-		mMaterial.Diffuse.TexLocation == INVALID_UNIFORM_LOCATION ||
 		mEyeWorldPosLocation == INVALID_UNIFORM_LOCATION ||
 		mDirLightLocation.Color == INVALID_UNIFORM_LOCATION ||
 		mDirLightLocation.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
 		mDirLightLocation.Direction == INVALID_UNIFORM_LOCATION ||
-		mMaterial.SpecularIntensity == INVALID_UNIFORM_LOCATION ||
+		mMaterial.Diffuse.TexLocation == INVALID_UNIFORM_LOCATION ||
+		mMaterial.Specular.TexLocation == INVALID_UNIFORM_LOCATION ||
+		mMaterial.Diffuse.Color == INVALID_UNIFORM_LOCATION ||
+		mMaterial.Specular.Color == INVALID_UNIFORM_LOCATION ||
 		mMaterial.Shininess == INVALID_UNIFORM_LOCATION ||
 		mNumPointLightsLocation == INVALID_UNIFORM_LOCATION ||
 		mNumSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
@@ -135,13 +139,6 @@ void BasicLightingTechnique::SetWorldMatrix(const glm::mat4& WorldInverse)
 	glUniformMatrix4fv(mWorldMatrixLocation, 1, GL_FALSE, &WorldInverse[0][0]);
 }
 
-
-void BasicLightingTechnique::SetColorTextureUnit(unsigned int TextureUnit)
-{
-	glUniform1i(mMaterial.Diffuse.TexLocation, TextureUnit);
-}
-
-
 void BasicLightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
 	glUniform3f(mDirLightLocation.Color, Light.Color.x, Light.Color.y, Light.Color.z);
@@ -151,7 +148,6 @@ void BasicLightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 	glUniform1f(mDirLightLocation.DiffuseIntensity, Light.DiffuseIntensity);
 }
 
-
 void BasicLightingTechnique::SetEyeWorldPos(const glm::vec3& EyeWorldPos)
 {
 	glUniform3f(mEyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);
@@ -159,10 +155,14 @@ void BasicLightingTechnique::SetEyeWorldPos(const glm::vec3& EyeWorldPos)
 
 void BasicLightingTechnique::SetMaterial(Material* mat)
 {
-	glUniform1f(mMaterial.SpecularIntensity, mat->mSpecularIntensity);
+	glUniform1i(mMaterial.Diffuse.TexLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
+	glUniform1i(mMaterial.Specular.TexLocation, SPECULAR_TEXTURE_UNIT_INDEX);
 	glUniform1f(mMaterial.Shininess, mat->mShininess);
 	glm::vec3 tempColor = mat->mDiffuse.mColor;
 	glUniform3f(mMaterial.Diffuse.Color, tempColor.x, tempColor.y, tempColor.z);
+	tempColor = mat->mSpecular.mColor;
+	glUniform3f(mMaterial.Specular.Color, tempColor.x, tempColor.y, tempColor.z);
+
 }
 
 void BasicLightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)

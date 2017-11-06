@@ -16,13 +16,10 @@ Texture::Texture()
 {
 	mTarget = GL_TEXTURE_2D;
 
-	int width = 2;
-	int height = 2;
+	int width = 1;
+	int height = 1;
 	GLenum format = GL_RGB;
 	float data[] = {
-		1, 1, 1,
-		1, 1, 1,
-		1, 1, 1,
 		1, 1, 1};
 	glGenTextures(1, &mID);
 	glBindTexture(mTarget, mID);

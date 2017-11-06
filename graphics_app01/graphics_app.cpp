@@ -16,8 +16,8 @@ void GraphicsApp::CalcFPS()
 {
 	const __int64 CurrentTickCounter = GetTickCounter();
 	const __int64 ElapsedTicks = CurrentTickCounter - mTickCounter;
-	mDeltaTime = (unsigned int) (ElapsedTicks * 1000) / mPerfCounterFreq;
-	mFps = mPerfCounterFreq / ElapsedTicks;
+	mDeltaTime = (unsigned int) ((ElapsedTicks * 1000) / mPerfCounterFreq);
+	mFps = unsigned int(mPerfCounterFreq / ElapsedTicks);
 
 	mTickCounter = CurrentTickCounter;
 }

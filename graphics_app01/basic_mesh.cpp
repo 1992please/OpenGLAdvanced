@@ -84,6 +84,7 @@ bool BasicMesh::LoadMesh(const char* Filename)
 				mMaterials[i]->mDiffuse.LoadColor(lCachedMesh->mMaterials[i]->mDiffuse.mColor);
 				mMaterials[i]->mSpecular.LoadTexture(lCachedMesh->mMaterials[i]->mSpecular.TexturePath);
 				mMaterials[i]->mSpecular.LoadColor(lCachedMesh->mMaterials[i]->mSpecular.mColor);
+				mMaterials[i]->mShininess = lCachedMesh->mMaterials[i]->mShinness;
 			}
 
 			// Generate and populate the buffers with vertex attributes and the indices
@@ -129,10 +130,13 @@ bool BasicMesh::LoadMesh(const char* Filename)
 void BasicMesh::Render(BasicLightingTechnique* Technique)
 {
 	glBindVertexArray(mVAO);
-
+	Technique ->Enable();
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
-		mMaterials[i]->mDiffuse.mTexture->Bind(COLOR_TEXTURE_UNIT);
+		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
+		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
+
+		//mMaterials[i]->mSpecular.mColor = glm::vec3(1);
 		Technique->SetMaterial(mMaterials[i]);
 		glDrawElements(
 			GL_TRIANGLES,
@@ -157,8 +161,8 @@ void BasicMesh::Render(uint NumInstances, const glm::mat4* WVPMats, const glm::m
 
 	for (uint i = 0; mMeshEntries.size(); i++)
 	{
-		if (mMaterials[i]->mDiffuse.mTexture)
-			mMaterials[i]->mDiffuse.mTexture->Bind(COLOR_TEXTURE_UNIT);
+		//if (mMaterials[i]->mDiffuse.mTexture)
+		//	mMaterials[i]->mDiffuse.mTexture->Bind(COLOR_TEXTURE_UNIT);
 
 
 		glDrawElementsInstanced(

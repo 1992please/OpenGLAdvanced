@@ -16,7 +16,6 @@ public:
 
 	void SetMVP(const glm::mat4& WVP);
 	void SetWorldMatrix(const glm::mat4& WVP);
-	void SetColorTextureUnit(unsigned int TextureUnit);
 	void SetDirectionalLight(const DirectionalLight& Light);
 	void SetPointLights(unsigned int NumLights, const PointLight* pLights);
 	void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
@@ -33,8 +32,7 @@ private:
 		struct{
 			GLuint TexLocation;
 			GLuint Color;
-		}Diffuse;
-		GLuint SpecularIntensity;
+		}Diffuse, Specular;
 		GLuint Shininess;
 	}mMaterial;
 

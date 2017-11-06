@@ -22,7 +22,6 @@ public:
 	// Data
 	ColorChannel mDiffuse;
 	ColorChannel mSpecular;
-	float mSpecularIntensity;
 	float mShininess;
 };
 

@@ -18,6 +18,7 @@ struct ColorChannel
 struct Material
 {
 	ColorChannel Diffuse;
+	ColorChannel Specular;
 	float SpecularIntensity;
 	float Shininess;
 };
@@ -66,25 +67,27 @@ uniform vec3 gEyeWorldPos;
 
 vec3 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
-    float AmbientColorRatio = 0;
-    float DiffuseColorRatio = 0;
-    float SpecularColorRatio = 0;
-
-    AmbientColorRatio =  Light.AmbientIntensity;
+    vec3 OutColor;
+    vec3 BaseColor = vec3(texture(gMaterial.Diffuse.Tex, TexCoord0)) * gMaterial.Diffuse.Color;
+    // ambient calculations
+    float AmbientColorRatio =  Light.AmbientIntensity;
+    // diffuse calculations
     float DiffuseFactor = max(dot(Normal, -LightDirection), 0.0);                                     
-                                                                                            
-    DiffuseColorRatio  = DiffuseFactor * Light.DiffuseIntensity;
+    float DiffuseColorRatio  = DiffuseFactor * Light.DiffuseIntensity;
 
+    OutColor = (DiffuseColorRatio + AmbientColorRatio) * BaseColor;
+
+    // spcular calculations
     vec3 ViewDirection = normalize(gEyeWorldPos - WorldPos0);
     vec3 LightReflect = normalize(reflect(LightDirection, Normal));
     float SpecularFactor = dot(ViewDirection, LightReflect);
     if(SpecularFactor > 0)
     {
         SpecularFactor = pow(SpecularFactor, gMaterial.Shininess);
-        SpecularColorRatio =  gMaterial.SpecularIntensity * SpecularFactor ;
+        OutColor += vec3(texture(gMaterial.Specular.Tex, TexCoord0)) * gMaterial.Specular.Color * SpecularFactor;
     }
-
-    return Light.Color * (AmbientColorRatio + DiffuseColorRatio + SpecularColorRatio);
+    OutColor *= Light.Color;
+    return OutColor;
 }
 
 vec3 CalcDirectionalLight(vec3 Normal)
@@ -136,7 +139,6 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    vec4 DiffuseColor = texture(gMaterial.Diffuse.Tex, TexCoord0) * vec4(gMaterial.Diffuse.Color, 1.0);
 
-    FragColor =  DiffuseColor * vec4(TotalLight, 1.0);
+    FragColor = vec4(TotalLight, 1.0);
 }

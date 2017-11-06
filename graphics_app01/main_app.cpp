@@ -5,7 +5,6 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
 #include "glm/ext.hpp"
-#include "engine_common.h"
 
 MainApp::MainApp()
 {
@@ -14,9 +13,9 @@ MainApp::MainApp()
 	mTexture = NULL;
 	m_scale = 0.0f;
 	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	mDirectionalLight.AmbientIntensity = 0.01f;
-	mDirectionalLight.DiffuseIntensity = 0.6f;
-	mDirectionalLight.Direction = glm::vec3(1.0f, -0.9, 0.8);
+	mDirectionalLight.AmbientIntensity = .2f;
+	mDirectionalLight.DiffuseIntensity = 1.0f;
+	mDirectionalLight.Direction = glm::vec3(.5f, -0.5f, 0.0);
 	mPersProjInfo.FOV = 60.0f;
 	mPersProjInfo.Height = WINDOW_HEIGHT;
 	mPersProjInfo.Width = WINDOW_WIDTH;
@@ -36,19 +35,19 @@ bool MainApp::Init()
 	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	mTechnique = new BasicLightingTechnique();
+
 	if (!mTechnique->Init())
 	{
 		return false;
 	}
-	mTechnique->Enable();
-	mTechnique->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+	//mTechnique->Enable();
+	
 
 	Mesh = new BasicMesh();
 	Mesh->LoadMesh("C:/Users/Nader/Desktop/nanosuit.fbx");
 
 	mTexture = new Texture(GL_TEXTURE_2D);
 	mTexture->Load("content/test.png");
-
 	return true;
 }
 
@@ -59,6 +58,7 @@ void MainApp::Run()
 
 void MainApp::RenderScene_callback()
 {
+	mTechnique->Enable();
 	CalcFPS();
 	m_scale += 0.01f;
 
@@ -86,7 +86,7 @@ void MainApp::RenderScene_callback()
 	Pipeline p;
 	p.Rotate(0.0f, 0.0f, 0.0f);
 	p.WorldPos(0.0f, 0.0f, 0.0f);
-	p.Scale(10.0f, 10.0f, 10.0f);
+	p.Scale(1.0f, 1.0f, 1.0f);
 	p.SetCamera(GameCamera->GetPos(), GameCamera->GetForward(), GameCamera->GetUp());
 	p.SetPerspectiveProj(mPersProjInfo);
 
@@ -100,6 +100,7 @@ void MainApp::RenderScene_callback()
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//mTechnique->Enable();
 
 	// render the triangle
 	Mesh->Render(mTechnique);

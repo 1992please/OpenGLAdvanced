@@ -172,6 +172,10 @@ CachedMaterial::CachedMaterial(const FbxSurfaceMaterial* pMaterial)
 		double lShininess = lShininessProperty.Get<FbxDouble>();
 		mShinness = static_cast<float>(lShininess);
 	}
+	else
+	{
+		mShinness = 32;
+	}
 }
 
 FbxDouble3 CachedMaterial::GetMaterialProperty(

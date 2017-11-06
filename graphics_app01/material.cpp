@@ -4,8 +4,7 @@
 
 Material::Material()
 {
-	mShininess = .5f;
-	mSpecularIntensity = 0.0;
+	mShininess = 32.f;
 }
 
 Material::~Material()
