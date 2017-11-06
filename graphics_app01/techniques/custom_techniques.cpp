@@ -1,5 +1,5 @@
 #include "util.h"
-#include "techniques.h"
+#include "custom_techniques.h"
 
 LightingTechnique::LightingTechnique()
 {
@@ -107,6 +107,11 @@ bool CustomTechnique::Init()
 void CustomTechnique::SetMVP(const glm::mat4 & MVP)
 {
 	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
+}
+
+void CustomTechnique::SetMaterial(const Material* mat)
+{
+
 }
 
 bool UnlitTechnique::Init()

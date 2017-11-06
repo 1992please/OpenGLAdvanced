@@ -3,7 +3,8 @@
 #include <glm\glm.hpp>
 #include <vector>
 #include "types.h"
-#include "basic_lighting_technique.h"
+
+class BasicTechnique;
 
 struct Vertex
 {
@@ -31,7 +32,7 @@ public:
 
 	bool LoadMesh(const char* Filename);
 
-	void Render(BasicLightingTechnique* Technique);
+	void Render(BasicTechnique* Technique);
 	void Render(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
 private:
 	void Clear();

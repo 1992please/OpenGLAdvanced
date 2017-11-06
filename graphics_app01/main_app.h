@@ -6,7 +6,8 @@
 #include "callbacks.h"
 #include <GL\glew.h>
 #include "Texture.h"
-#include "basic_lighting_technique.h"
+#include "techniques/basic_lighting_technique.h"
+#include "techniques/custom_techniques.h"
 #include "camera.h"
 #include "basic_mesh.h"
 
@@ -25,11 +26,11 @@ public:
 	void PassiveMouse_callback(float x, float y) override;
 private:
 	BasicLightingTechnique* mTechnique;
+	CustomTechnique* mCustomTechnique;
 	Camera* GameCamera;
 	float m_scale;
 	DirectionalLight mDirectionalLight;
 	PersProjInfo mPersProjInfo;
-	Texture* mTexture;
 	BasicMesh* Mesh;
 };
 

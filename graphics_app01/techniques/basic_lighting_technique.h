@@ -1,10 +1,9 @@
 #pragma once
 
-#include "technique.h"
+#include "basic_technique.h"
 #include "lights_common.h"
-#include "material.h"
 
-class BasicLightingTechnique : public Technique
+class BasicLightingTechnique : public BasicTechnique
 {
 public:
 	static const unsigned int MAX_POINT_LIGHTS = 2;
@@ -20,7 +19,7 @@ public:
 	void SetPointLights(unsigned int NumLights, const PointLight* pLights);
 	void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
 	void SetEyeWorldPos(const glm::vec3& EyeWorldPos);
-	void SetMaterial(Material* mat);
+	void SetMaterial(const Material* mat) override;
 private:
 	GLuint mMVPLocation;
 	GLuint mWorldMatrixLocation;

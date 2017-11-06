@@ -1,6 +1,6 @@
 #ifndef TECHNIQUES_H
 #define	TECHNIQUES_H
-#include "Technique.h"
+#include "basic_technique.h"
 #include "lights_common.h"
 
 class LightingTechnique : public Technique
@@ -45,13 +45,13 @@ private:
 	GLuint mSamplerLocation;
 };
 
-class CustomTechnique : public Technique
+class CustomTechnique : public BasicTechnique
 {
 public:
 	CustomTechnique() {};
-	virtual bool Init();
+	bool Init() override;
 	void SetMVP(const glm::mat4& MVP);
-
+	void SetMaterial(const Material* mat) override;
 private:
 	GLuint mMVPLocation;
 };

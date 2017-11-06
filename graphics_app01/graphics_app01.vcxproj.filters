@@ -21,15 +21,15 @@
     <ClInclude Include="lights_common.h" />
     <ClInclude Include="pipeline.h" />
     <ClInclude Include="math_3d.h" />
-    <ClInclude Include="techniques.h" />
-    <ClInclude Include="technique.h" />
-    <ClInclude Include="basic_lighting_technique.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="engine_common.h" />
+    <ClInclude Include="techniques\technique.h" />
+    <ClInclude Include="techniques\basic_lighting_technique.h" />
+    <ClInclude Include="techniques\basic_technique.h" />
+    <ClInclude Include="techniques\custom_techniques.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
     <ClCompile Include="FbxUtil.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="glfw_backend.cpp" />
@@ -38,22 +38,12 @@
     <ClCompile Include="main_app.cpp" />
     <ClCompile Include="basic_mesh.cpp" />
     <ClCompile Include="pipeline.cpp" />
-    <ClCompile Include="techniques.cpp" />
-    <ClCompile Include="technique.cpp" />
-    <ClCompile Include="basic_lighting_technique.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="texture.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\lighting.vs" />
-    <None Include="shaders\lighting.fs" />
-    <None Include="shaders\shader.fs" />
-    <None Include="shaders\shader.vs" />
-    <None Include="shaders\colorful.vs" />
-    <None Include="shaders\colorful.fs" />
-    <None Include="shaders\unlit.fs" />
-    <None Include="shaders\unlit.vs" />
-    <None Include="shaders\basic_lighting.vs" />
-    <None Include="shaders\basic_lighting.fs" />
+    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="techniques\technique.cpp" />
+    <ClCompile Include="techniques\basic_lighting_technique.cpp" />
+    <ClCompile Include="techniques\basic_technique.cpp" />
+    <ClCompile Include="techniques\custom_techniques.cpp" />
   </ItemGroup>
 </Project>

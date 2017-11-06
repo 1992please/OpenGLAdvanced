@@ -2,6 +2,7 @@
 #include "basic_lighting_technique.h"
 #include "util.h"
 #include "engine_common.h"
+#include "material.h"
 
 BasicLightingTechnique::BasicLightingTechnique()
 {
@@ -153,7 +154,7 @@ void BasicLightingTechnique::SetEyeWorldPos(const glm::vec3& EyeWorldPos)
 	glUniform3f(mEyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);
 }
 
-void BasicLightingTechnique::SetMaterial(Material* mat)
+void BasicLightingTechnique::SetMaterial(const Material* mat)
 {
 	glUniform1i(mMaterial.Diffuse.TexLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
 	glUniform1i(mMaterial.Specular.TexLocation, SPECULAR_TEXTURE_UNIT_INDEX);

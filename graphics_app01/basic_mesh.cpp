@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include "Texture.h"
 #include "engine_common.h"
+#include "techniques/basic_technique.h"
 
 const int VERTEX_STRIDE = 3;
 // Three floats for every normal.
@@ -127,7 +128,7 @@ bool BasicMesh::LoadMesh(const char* Filename)
 	return Ret;
 }
 
-void BasicMesh::Render(BasicLightingTechnique* Technique)
+void BasicMesh::Render(BasicTechnique* Technique)
 {
 	glBindVertexArray(mVAO);
 	Technique ->Enable();

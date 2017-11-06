@@ -10,7 +10,7 @@ MainApp::MainApp()
 {
 	GameCamera = NULL;
 	mTechnique = NULL;
-	mTexture = NULL;
+	mCustomTechnique = NULL;
 	m_scale = 0.0f;
 	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	mDirectionalLight.AmbientIntensity = .2f;
@@ -27,7 +27,6 @@ MainApp::~MainApp()
 {
 	delete mTechnique;
 	delete GameCamera;
-	delete mTexture;
 }
 
 bool MainApp::Init()
@@ -35,8 +34,12 @@ bool MainApp::Init()
 	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	mTechnique = new BasicLightingTechnique();
-
+	mCustomTechnique = new CustomTechnique();
 	if (!mTechnique->Init())
+	{
+		return false;
+	}
+	if (!mCustomTechnique->Init())
 	{
 		return false;
 	}
@@ -45,9 +48,6 @@ bool MainApp::Init()
 
 	Mesh = new BasicMesh();
 	Mesh->LoadMesh("C:/Users/Nader/Desktop/nanosuit.fbx");
-
-	mTexture = new Texture(GL_TEXTURE_2D);
-	mTexture->Load("content/test.png");
 	return true;
 }
 
@@ -58,7 +58,6 @@ void MainApp::Run()
 
 void MainApp::RenderScene_callback()
 {
-	mTechnique->Enable();
 	CalcFPS();
 	m_scale += 0.01f;
 
@@ -79,9 +78,7 @@ void MainApp::RenderScene_callback()
 	sl.Direction = GameCamera->GetForward();
 	sl.Attenuation.Linear = 0.1f;
 	sl.Cutoff = 10.0f;
-	//Technique->SetSpotLights(1, &sl);
-	mTechnique->SetSpotLights(0, NULL);
-	mTechnique->SetPointLights(0, pl);
+
 
 	Pipeline p;
 	p.Rotate(0.0f, 0.0f, 0.0f);
@@ -92,18 +89,24 @@ void MainApp::RenderScene_callback()
 
 	//glm::rotate(V, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-
+	mCustomTechnique->Enable();
+	mCustomTechnique->SetMVP(p.GetMVPTrans());
+	
+	mTechnique->Enable();
 	mTechnique->SetMVP(p.GetMVPTrans());
 	mTechnique->SetWorldMatrix(p.GetModelTrans());
 	mTechnique->SetDirectionalLight(mDirectionalLight);
 	mTechnique->SetEyeWorldPos(GameCamera->GetPos());
+	//Technique->SetSpotLights(1, &sl);
+	mTechnique->SetSpotLights(0, NULL);
+	mTechnique->SetPointLights(0, pl);
 
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//mTechnique->Enable();
 
 	// render the triangle
-	Mesh->Render(mTechnique);
+	Mesh->Render(mCustomTechnique);
 }
 
 void MainApp::Keyboard_callback(KEY key)
