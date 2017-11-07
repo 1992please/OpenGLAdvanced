@@ -46,4 +46,8 @@
     <ClCompile Include="techniques\basic_technique.cpp" />
     <ClCompile Include="techniques\custom_techniques.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\stencil_test.fs" />
+    <None Include="shaders\stencil_test.vs" />
+  </ItemGroup>
 </Project>

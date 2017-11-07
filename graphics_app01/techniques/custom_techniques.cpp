@@ -90,7 +90,7 @@ bool CustomTechnique::Init()
 		return false;
 	}
 
-	if (!AddShader("shaders/shader.vs", "shaders/shader.fs")) {
+	if (!AddShader("shaders/stencil_test.vs", "shaders/stencil_test.fs")) {
 		return false;
 	}
 

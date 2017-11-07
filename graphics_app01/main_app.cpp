@@ -53,6 +53,16 @@ bool MainApp::Init()
 
 void MainApp::Run()
 {
+	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilMask(0x00);
 	GLFWBackendRun(this);
 }
 
@@ -82,17 +92,19 @@ void MainApp::RenderScene_callback()
 
 	Pipeline p;
 	p.Rotate(0.0f, 0.0f, 0.0f);
-	p.WorldPos(0.0f, 0.0f, 0.0f);
-	p.Scale(1.0f, 1.0f, 1.0f);
 	p.SetCamera(GameCamera->GetPos(), GameCamera->GetForward(), GameCamera->GetUp());
 	p.SetPerspectiveProj(mPersProjInfo);
 
 	//glm::rotate(V, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
 	mCustomTechnique->Enable();
+	p.Scale(1.02f, 1.02f, 1.02f);
+	p.WorldPos(0.0f, -0.2f, 0.0f);
 	mCustomTechnique->SetMVP(p.GetMVPTrans());
 	
 	mTechnique->Enable();
+	p.Scale(1.0f, 1.0f, 1.0f);
+	p.WorldPos(0.0f, 0.0f, 0.0f);
 	mTechnique->SetMVP(p.GetMVPTrans());
 	mTechnique->SetWorldMatrix(p.GetModelTrans());
 	mTechnique->SetDirectionalLight(mDirectionalLight);
@@ -100,13 +112,23 @@ void MainApp::RenderScene_callback()
 	//Technique->SetSpotLights(1, &sl);
 	mTechnique->SetSpotLights(0, NULL);
 	mTechnique->SetPointLights(0, pl);
-
-	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	//mTechnique->Enable();
 
 	// render the triangle
+	//Mesh->Render(mCustomTechnique);
+	//glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should update the stencil buffer
+	//glStencilMask(0xFF); // enable writing to the stencil buffer
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
+	Mesh->Render(mTechnique);
+
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);// we will not write any thing to stencil
+	glDisable(GL_DEPTH_TEST);
 	Mesh->Render(mCustomTechnique);
+	glStencilMask(0xFF);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void MainApp::Keyboard_callback(KEY key)

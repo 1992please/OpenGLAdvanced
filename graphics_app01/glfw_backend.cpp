@@ -8,8 +8,6 @@
 static ICallbacks* s_pCallbacks = NULL;
 
 static GLFWwindow* s_pWindow = NULL;
-static bool sWithDepth = false;
-static bool sWithStencil = false;
 
 static KEY GLFWKeyToOGLDEVKey(uint Key)
 {
@@ -158,10 +156,8 @@ void GLFWErrorCallback(int error, const char* description)
 }
 
 
-void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
+void GLFWBackendInit(int argc, char** argv)
 {
-	sWithDepth = WithDepth;
-	sWithStencil = WithStencil;
 
 	glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -224,20 +220,14 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 		exit(1);
 	}
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
-
-	if (sWithDepth) {
-		glEnable(GL_DEPTH_TEST);
-	}
-
-	s_pCallbacks = pCallbacks;
-	InitCallbacks();
 	// Additional window configurations
 	glfwSetInputMode(s_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//glfwSwapInterval(-1);
+
+	// CallBacks
+	s_pCallbacks = pCallbacks;
+	InitCallbacks();
+
 	while (!glfwWindowShouldClose(s_pWindow)) 
 	{
 		processInput();

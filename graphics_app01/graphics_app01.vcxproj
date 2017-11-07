@@ -187,6 +187,10 @@
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\stencil_test.fs" />
+    <None Include="shaders\stencil_test.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

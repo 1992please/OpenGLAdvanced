@@ -3,7 +3,7 @@
 #include "types.h"
 #include "callbacks.h"
 
-void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil);
+void GLFWBackendInit(int argc, char** argv);
 
 void GLFWBackendTerminate();
 

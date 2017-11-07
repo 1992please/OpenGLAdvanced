@@ -3,7 +3,7 @@
 
 int main(int argc, char** argv)
 {
-	GLFWBackendInit(argc, argv, true, false);
+	GLFWBackendInit(argc, argv);
 	if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Graphics Engine"))
 	{
 		GLFWBackendTerminate();
