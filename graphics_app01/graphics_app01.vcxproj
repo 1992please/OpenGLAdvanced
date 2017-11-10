@@ -70,19 +70,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(ProjectDir);$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)source;$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\lib\vs2015\x86\debug;$(SolutionDir)deps\libs\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir);$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)source;$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\lib\vs2015\x86\release;$(SolutionDir)deps\libs\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\lib\vs2015\x64\debug;$(SolutionDir)deps\libs\x64;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir);$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)source;$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir);$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)source;$(SolutionDir)deps\includes;C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2018.1.1\lib\vs2015\x64\release;$(SolutionDir)deps\libs\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -148,44 +148,44 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="techniques\basic_technique.h" />
-    <ClInclude Include="techniques\basic_lighting_technique.h" />
-    <ClInclude Include="basic_mesh.h" />
-    <ClInclude Include="callbacks.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="engine_common.h" />
-    <ClInclude Include="FbxUtil.h" />
-    <ClInclude Include="glfw_backend.h" />
-    <ClInclude Include="graphics_app.h" />
-    <ClInclude Include="keys.h" />
-    <ClInclude Include="material.h" />
-    <ClInclude Include="techniques\custom_techniques.h" />
-    <ClInclude Include="main_app.h" />
-    <ClInclude Include="lights_common.h" />
-    <ClInclude Include="math_3d.h" />
-    <ClInclude Include="pipeline.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="techniques\technique.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="util.h" />
+    <ClInclude Include="Source\techniques\basic_technique.h" />
+    <ClInclude Include="Source\techniques\basic_lighting_technique.h" />
+    <ClInclude Include="Source\basic_mesh.h" />
+    <ClInclude Include="Source\callbacks.h" />
+    <ClInclude Include="Source\camera.h" />
+    <ClInclude Include="Source\engine_common.h" />
+    <ClInclude Include="Source\FbxUtil.h" />
+    <ClInclude Include="Source\glfw_backend.h" />
+    <ClInclude Include="Source\graphics_app.h" />
+    <ClInclude Include="Source\keys.h" />
+    <ClInclude Include="Source\material.h" />
+    <ClInclude Include="Source\techniques\custom_techniques.h" />
+    <ClInclude Include="Source\main_app.h" />
+    <ClInclude Include="Source\lights_common.h" />
+    <ClInclude Include="Source\math_3d.h" />
+    <ClInclude Include="Source\pipeline.h" />
+    <ClInclude Include="Source\stb_image.h" />
+    <ClInclude Include="Source\techniques\technique.h" />
+    <ClInclude Include="Source\texture.h" />
+    <ClInclude Include="Source\types.h" />
+    <ClInclude Include="Source\util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="techniques\basic_technique.cpp" />
-    <ClCompile Include="techniques\basic_lighting_technique.cpp" />
-    <ClCompile Include="basic_mesh.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="FbxUtil.cpp" />
-    <ClCompile Include="glfw_backend.cpp" />
-    <ClCompile Include="graphics_app.cpp" />
-    <ClCompile Include="material.cpp" />
-    <ClCompile Include="techniques\custom_techniques.cpp" />
-    <ClCompile Include="main_app.cpp" />
-    <ClCompile Include="pipeline.cpp" />
-    <ClCompile Include="Source.cpp" />
-    <ClCompile Include="techniques\technique.cpp" />
-    <ClCompile Include="texture.cpp" />
-    <ClCompile Include="util.cpp" />
+    <ClCompile Include="Source\techniques\basic_technique.cpp" />
+    <ClCompile Include="Source\techniques\basic_lighting_technique.cpp" />
+    <ClCompile Include="Source\basic_mesh.cpp" />
+    <ClCompile Include="Source\camera.cpp" />
+    <ClCompile Include="Source\FbxUtil.cpp" />
+    <ClCompile Include="Source\glfw_backend.cpp" />
+    <ClCompile Include="Source\graphics_app.cpp" />
+    <ClCompile Include="Source\material.cpp" />
+    <ClCompile Include="Source\techniques\custom_techniques.cpp" />
+    <ClCompile Include="Source\main_app.cpp" />
+    <ClCompile Include="Source\pipeline.cpp" />
+    <ClCompile Include="Source\Source.cpp" />
+    <ClCompile Include="Source\techniques\technique.cpp" />
+    <ClCompile Include="Source\texture.cpp" />
+    <ClCompile Include="Source\util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\blending.fs" />

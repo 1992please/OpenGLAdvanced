@@ -24,7 +24,7 @@ MainApp::MainApp()
 	mPersProjInfo.zNear = 1.0f;
 	mPersProjInfo.zFar = 1000.0f;
 	bFirstRender = true;
-	mAmount = 500000;
+	mAmount = 200000;
 }
 
 MainApp::~MainApp()
