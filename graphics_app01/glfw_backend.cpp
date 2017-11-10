@@ -221,6 +221,7 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 	}
 
 	// Additional window configurations
+	glfwSetWindowPos(s_pWindow, 500, 100);
 	glfwSetInputMode(s_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//glfwSwapInterval(-1);
 

@@ -8,127 +8,137 @@
 
 MainApp::MainApp()
 {
+	mUnlitTechnique = NULL;
+	mInstUnlitTechnique = NULL;
 	GameCamera = NULL;
-	mTechnique = NULL;
-	mCustomTechnique = NULL;
-	m_scale = 0.0f;
+	mPlanetMesh = NULL;
+	mRockMesh = NULL;
+
 	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	mDirectionalLight.AmbientIntensity = .2f;
 	mDirectionalLight.DiffuseIntensity = 1.0f;
-	mDirectionalLight.Direction = glm::vec3(.5f, -0.5f, 0.0);
+	mDirectionalLight.Direction = glm::vec3(0.5f, -0.5f, 0.5f);
 	mPersProjInfo.FOV = 60.0f;
 	mPersProjInfo.Height = WINDOW_HEIGHT;
 	mPersProjInfo.Width = WINDOW_WIDTH;
-	mPersProjInfo.zNear = .1f;
-	mPersProjInfo.zFar = 100.0f;
+	mPersProjInfo.zNear = 1.0f;
+	mPersProjInfo.zFar = 1000.0f;
+	bFirstRender = true;
+	mAmount = 500000;
 }
 
 MainApp::~MainApp()
 {
-	delete mTechnique;
 	delete GameCamera;
+	delete mRockMesh;
+	delete mUnlitTechnique;
+	delete mInstUnlitTechnique;
+	delete[] Models;
+	delete[] MVP;
 }
 
 bool MainApp::Init()
 {
 	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	mTechnique = new BasicLightingTechnique();
-	mCustomTechnique = new CustomTechnique();
-	if (!mTechnique->Init())
-	{
+	mUnlitTechnique = new UnlitTechnique();
+	if (!mUnlitTechnique->Init())
 		return false;
-	}
-	if (!mCustomTechnique->Init())
-	{
-		return false;
-	}
-	//mTechnique->Enable();
-	
 
-	Mesh = new BasicMesh();
-	Mesh->LoadMesh("C:/Users/Nader/Desktop/nanosuit.fbx");
+	mInstUnlitTechnique = new InstancedUnlitTechnique();
+	if (!mInstUnlitTechnique->Init())
+		return false;
+
+	mPlanetMesh = new BasicMesh();
+	if (!mPlanetMesh->LoadMesh("content/planet.fbx"))
+		return false;
+
+	mRockMesh = new BasicMesh();
+	if (!mRockMesh->LoadMesh("content/rock.fbx"))
+		return false;
+
+	srand(0);
+
+
+	Orientations = new Orientation[mAmount];
+	float radius = 50.0;
+	float offset = 20.f;
+	for (uint i = 0; i < mAmount; i++)
+	{
+		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
+		float angle = (float)i / (float)mAmount * 360.0f;
+		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float x = sin(angle) * radius + displacement;
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float y = displacement * 0.1f; // keep height of asteroid field smaller compared to width of x and z
+		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+		float z = cos(angle) * radius + displacement;
+		Orientations[i].mWorldPos = glm::vec3(x, y, z);
+
+		// 2. scale: Scale between 0.05 and 0.25f
+		float scale = (rand() % 20) / 100.0f + 0.05f;
+		Orientations[i].mScale = glm::vec3(scale);
+
+		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+		float rotAngle = float(rand() % 360);
+		Orientations[i].mRotation = glm::vec3(0.0f, 0.0f, rotAngle);
+	}
+	Models = new glm::mat4[mAmount];
+	MVP = new glm::mat4[mAmount];
 	return true;
 }
 
 void MainApp::Run()
 {
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	glEnable(GL_STENCIL_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	glStencilMask(0x00);
+
+
 	GLFWBackendRun(this);
 }
 
 void MainApp::RenderScene_callback()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Some Calculations every frame
 	CalcFPS();
-	m_scale += 0.01f;
-
-	PointLight pl[2];
-	pl[0].DiffuseIntensity = 1.0f;
-	pl[0].Color = glm::vec3(1.0f, 0.5f, 0.0f);
-	pl[0].Position = glm::vec3(3.0f, 1.0f, 10 * (cosf(m_scale) + 1.0f) / 2.0f);
-	pl[0].Attenuation.Linear = 0.1f;
-	pl[1].DiffuseIntensity = 1.0f;
-	pl[1].Color = glm::vec3(0.0f, 0.5f, 1.0f);
-	pl[1].Position = glm::vec3(-3.0f, 1.0f, 10 * (sinf(m_scale) + 1.0f) / 2.0f);
-	pl[1].Attenuation.Linear = 0.1f;
-
-	SpotLight sl;
-	sl.DiffuseIntensity = 0.9f;
-	sl.Color = glm::vec3(0.0f, 1.0f, 1.0f);
-	sl.Position = GameCamera->GetPos();
-	sl.Direction = GameCamera->GetForward();
-	sl.Attenuation.Linear = 0.1f;
-	sl.Cutoff = 10.0f;
-
-
 	Pipeline p;
-	p.Rotate(0.0f, 0.0f, 0.0f);
 	p.SetCamera(GameCamera->GetPos(), GameCamera->GetForward(), GameCamera->GetUp());
 	p.SetPerspectiveProj(mPersProjInfo);
+	glm::mat4 VP = p.GetVPTrans();
+	mUnlitTechnique->Enable();
+	p.Scale(glm::vec3(4.0f));
+	p.WorldPos(0.0f, -5.0f, 0.0f);
+	mUnlitTechnique->SetMVP(VP * p.GetModelTrans());
+	mPlanetMesh->Render(mUnlitTechnique);
 
-	//glm::rotate(V, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::mat4 P = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-	mCustomTechnique->Enable();
-	p.Scale(1.02f, 1.02f, 1.02f);
-	p.WorldPos(0.0f, -0.2f, 0.0f);
-	mCustomTechnique->SetMVP(p.GetMVPTrans());
-	
-	mTechnique->Enable();
-	p.Scale(1.0f, 1.0f, 1.0f);
-	p.WorldPos(0.0f, 0.0f, 0.0f);
-	mTechnique->SetMVP(p.GetMVPTrans());
-	mTechnique->SetWorldMatrix(p.GetModelTrans());
-	mTechnique->SetDirectionalLight(mDirectionalLight);
-	mTechnique->SetEyeWorldPos(GameCamera->GetPos());
-	//Technique->SetSpotLights(1, &sl);
-	mTechnique->SetSpotLights(0, NULL);
-	mTechnique->SetPointLights(0, pl);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//mTechnique->Enable();
+	// render the rocks
+	p.Scale(glm::vec3(1.0f));
+	if (bFirstRender)
+	{
+		bFirstRender = !bFirstRender;
+		for (uint i = 0; i < mAmount; i++)
+		{
+			p.Orient(Orientations[i]);
+			Models[i] = p.GetModelTrans();
+		}
+	}
+	__int64 Time = GetRunningTime();
+	for (uint i = 0; i < mAmount; i++)
+	{
+		p.Orient(Orientations[i]);
+		MVP[i] = VP * Models[i];
+	}
+	printf("1: %I64d, ", GetRunningTime() - Time);
+	Time = GetRunningTime();
+	mRockMesh->RenderDynamic(mInstUnlitTechnique, mAmount, MVP, NULL);
+	printf("2: %I64d, fps: %d\n", GetRunningTime() - Time, mFps);
 
-	// render the triangle
-	//Mesh->Render(mCustomTechnique);
-	//glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should update the stencil buffer
-	//glStencilMask(0xFF); // enable writing to the stencil buffer
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
-	Mesh->Render(mTechnique);
-
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);// we will not write any thing to stencil
-	glDisable(GL_DEPTH_TEST);
-	Mesh->Render(mCustomTechnique);
-	glStencilMask(0xFF);
-	glEnable(GL_DEPTH_TEST);
 }
 
 void MainApp::Keyboard_callback(KEY key)
@@ -149,7 +159,7 @@ void MainApp::Keyboard_callback(KEY key)
 		default:
 			break;
 	}
-	GameCamera->OnKeyboard(key, (float)mDeltaTime/1000);
+	GameCamera->OnKeyboard(key, (float)mDeltaTime / 1000);
 }
 
 void MainApp::PassiveMouse_callback(float x, float y)

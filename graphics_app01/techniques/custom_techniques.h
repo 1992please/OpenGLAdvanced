@@ -32,14 +32,24 @@ private:
 
 
 
-class UnlitTechnique : public Technique
+class UnlitTechnique : public BasicTechnique
 {
 public:
 	UnlitTechnique() {};
 	virtual bool Init();
 	void SetMVP(const glm::mat4& MVP);
-	void SetTextureUnit(unsigned int TextureUnit);
+	void SetMaterial(const Material* mat) override;
+private:
+	GLuint mMVPLocation;
+	GLuint mSamplerLocation;
+};
 
+class InstancedUnlitTechnique : public BasicTechnique
+{
+public:
+	InstancedUnlitTechnique() {};
+	virtual bool Init();
+	void SetMaterial(const Material* mat) override;
 private:
 	GLuint mMVPLocation;
 	GLuint mSamplerLocation;

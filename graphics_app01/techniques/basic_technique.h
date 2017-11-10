@@ -9,7 +9,7 @@ class BasicTechnique : public Technique
 public:
 	BasicTechnique();
 	~BasicTechnique();
-	virtual void SetMaterial(const Material* mat) {};
+	virtual void SetMaterial(const Material* mat) = 0;
 };
 
 #endif // !BAISC_TECHNIQUE_H

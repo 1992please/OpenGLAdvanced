@@ -24,6 +24,13 @@ struct Vertex
 class Material;
 struct CachedMesh;
 
+enum ShapeType
+{
+	ShapeType_Cube,
+	ShapeType_Quad,
+	ShapeType_Sphere
+};
+
 class BasicMesh
 {
 public:
@@ -31,12 +38,15 @@ public:
 	~BasicMesh();
 
 	bool LoadMesh(const char* Filename);
-
+	bool LoadMesh(ShapeType Type);
+	// use this one wisely( maybe when the camera is static)
+	bool InitInstancedStatic(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
 	void Render(BasicTechnique* Technique);
-	void Render(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
+	void RenderDynamic(BasicTechnique* Technique, uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
+	void RenderStatic(BasicTechnique* Technique, uint NumInstances);
 private:
 	void Clear();
-
+	
 	enum
 	{
 		POS_VB,

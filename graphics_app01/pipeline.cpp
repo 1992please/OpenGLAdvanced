@@ -102,6 +102,7 @@ void Pipeline::Rotate(const glm::vec3 & r)
 void Pipeline::SetPerspectiveProj(const PersProjInfo & p)
 {
 	mPersProjInfo = p;
+	GetProjTrans();
 }
 
 void Pipeline::SetCamera(const glm::vec3 & Pos, const glm::vec3 Forward, const glm::vec3 & Up)
@@ -126,8 +127,6 @@ void Pipeline::Orient(const Orientation & o)
 const glm::mat4 & Pipeline::GetMPTrans()
 {
 	GetModelTrans();
-	GetProjTrans();
-
 	mMP = mP * mM;
 	return mMP;
 }
@@ -136,7 +135,6 @@ const glm::mat4 & Pipeline::GetMVTrans()
 {
 	GetModelTrans();
 	GetViewTrans();
-
 	mMV = mV * mM;
 	return mMV;
 }
@@ -144,7 +142,6 @@ const glm::mat4 & Pipeline::GetMVTrans()
 const glm::mat4 & Pipeline::GetVPTrans()
 {
 	GetViewTrans();
-	GetProjTrans();
 	mVP = mP * mV;
 	return mVP;
 }
@@ -170,11 +167,11 @@ const glm::mat4 & Pipeline::GetMVOrthoPTrans()
 const glm::mat4 & Pipeline::GetModelTrans()
 {
 	glm::mat4 M;
+	M = glm::translate(M, mWorldPos);
 	M = glm::scale(M, mScale);
 	M = glm::rotate(M, mRotateInfo.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	M = glm::rotate(M, mRotateInfo.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	M = glm::rotate(M, mRotateInfo.z, glm::vec3(0.0f, 0.0f, 1.0f));
-	M = glm::translate(M, mWorldPos);
 	mM = M;
 	return mM;
 }

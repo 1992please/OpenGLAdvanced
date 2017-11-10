@@ -17,6 +17,28 @@ const int UV_STRIDE = 2;
 #define POSITION_LOCATION 0
 #define TEX_COORD_LOCATION 1
 #define NORMAL_LOCATION 2
+#define MVP_LOCATION 3
+#define  WORLD_LOCATION 7
+
+static void ShowVertices(const CachedMesh* lMesh)
+{
+	// Generate and populate the buffers with vertex attributes and the indices
+	const int lPolygonVertexCount = lMesh->mPolygonVertexCount;
+	const int lPolygonCount = lMesh->mPolygonCount;
+	float * const lVertices = lMesh->mVertices;
+	float * const lNormals = lMesh->mNormals;
+	float * const lUVs = lMesh->mUVs;
+	GLuint * const lIndices = lMesh->mIndices;
+	for (int i = 0; i < lPolygonVertexCount; i++)
+	{
+		const int index = i * 3;
+		const int uvIndex = i * 2;
+		printf("%f, %f, %f, %f, %f, %f, %f, %f\n",
+			lVertices[index], lVertices[index + 1], lVertices[index + 2],
+			lNormals[index], lNormals[index + 1], lNormals[index + 2],
+			lUVs[uvIndex], lUVs[uvIndex + 1]);
+	}
+}
 
 BasicMesh::BasicMesh()
 {
@@ -96,10 +118,13 @@ bool BasicMesh::LoadMesh(const char* Filename)
 			float * const lUVs = lCachedMesh->mUVs;
 			GLuint * const lIndices = lCachedMesh->mIndices;
 
+			//ShowVertices(lCachedMesh);
+			// positions
 			glBindBuffer(GL_ARRAY_BUFFER, mBuffers[POS_VB]);
 			glBufferData(GL_ARRAY_BUFFER, lPolygonVertexCount * VERTEX_STRIDE * sizeof(float), lVertices, GL_STATIC_DRAW);
 			glEnableVertexAttribArray(POSITION_LOCATION);
 			glVertexAttribPointer(POSITION_LOCATION, VERTEX_STRIDE, GL_FLOAT, GL_FALSE, 0, 0);
+			// normals
 			if (lNormals)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, mBuffers[NORMAL_VB]);
@@ -107,7 +132,7 @@ bool BasicMesh::LoadMesh(const char* Filename)
 				glEnableVertexAttribArray(NORMAL_LOCATION);
 				glVertexAttribPointer(NORMAL_LOCATION, NORMAL_STRIDE, GL_FLOAT, GL_FALSE, 0, 0);
 			}
-
+			// UVs
 			if (lUVs)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, mBuffers[TEXCOORD_VB]);
@@ -115,8 +140,27 @@ bool BasicMesh::LoadMesh(const char* Filename)
 				glEnableVertexAttribArray(TEX_COORD_LOCATION);
 				glVertexAttribPointer(TEX_COORD_LOCATION, UV_STRIDE, GL_FLOAT, GL_FALSE, 0, 0);
 			}
+			// indices
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffers[INDEX_BUFFER]);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, lPolygonCount * 3 * sizeof(unsigned int), lIndices, GL_STATIC_DRAW);
+
+			// MVP matrices
+			glBindBuffer(GL_ARRAY_BUFFER, mBuffers[MVP_MAT_VB]);
+			for (unsigned int i = 0; i < 4; i++)
+			{
+				glEnableVertexAttribArray(MVP_LOCATION + i);
+				glVertexAttribPointer(MVP_LOCATION + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(GLfloat) * i * 4));
+				glVertexAttribDivisor(MVP_LOCATION + i, 1);
+			}
+			// World matrices
+			glBindBuffer(GL_ARRAY_BUFFER, mBuffers[WORLD_MAT_VB]);
+			for (unsigned int i = 0; i < 4; i++)
+			{
+				glEnableVertexAttribArray(WORLD_LOCATION + i);
+				glVertexAttribPointer(WORLD_LOCATION + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (const GLvoid*)(sizeof(GLfloat) * i * 4));
+				glVertexAttribDivisor(WORLD_LOCATION + i, 1);
+			}
+
 			Ret = (glGetError() == GL_NO_ERROR);
 		}
 		FbxUtil::DeAlocate(lCachedMesh);
@@ -128,10 +172,38 @@ bool BasicMesh::LoadMesh(const char* Filename)
 	return Ret;
 }
 
+bool BasicMesh::LoadMesh(ShapeType Type)
+{
+	switch (Type)
+	{
+		case ShapeType_Cube:
+			return LoadMesh("content/basic_shapes/cube.fbx");
+		case ShapeType_Quad:
+			return LoadMesh("content/basic_shapes/quad.fbx");
+		case ShapeType_Sphere:
+			return LoadMesh("content/basic_shapes/sphere.fbx");
+		default:
+			return false;
+	}
+}
+
+bool BasicMesh::InitInstancedStatic(uint NumInstances, const glm::mat4* MVPMats, const glm::mat4* WorldMats)
+{
+	glBindVertexArray(mVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, mBuffers[MVP_MAT_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, MVPMats, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mBuffers[WORLD_MAT_VB]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, WorldMats, GL_STATIC_DRAW);
+	glBindVertexArray(0);
+
+	return (glGetError() == GL_NO_ERROR);
+}
+
 void BasicMesh::Render(BasicTechnique* Technique)
 {
 	glBindVertexArray(mVAO);
-	Technique ->Enable();
+	Technique->Enable();
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
 		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
@@ -146,25 +218,31 @@ void BasicMesh::Render(BasicTechnique* Technique)
 			(void*)(sizeof(uint) * mMeshEntries[i].BaseIndex));
 	}
 
-	// Make sure the VAO is not changed from the outside 
+	// Make sure the VAO is not changed from the outside
 	glBindVertexArray(0);
 }
 
-void BasicMesh::Render(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats)
+void BasicMesh::RenderDynamic(BasicTechnique* Technique, uint NumInstances, const glm::mat4* MVPMats, const glm::mat4* WorldMats)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, mBuffers[MVP_MAT_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mBuffers[WORLD_MAT_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
-
 	glBindVertexArray(mVAO);
-
-	for (uint i = 0; mMeshEntries.size(); i++)
+	if (MVPMats)
 	{
-		//if (mMaterials[i]->mDiffuse.mTexture)
-		//	mMaterials[i]->mDiffuse.mTexture->Bind(COLOR_TEXTURE_UNIT);
+		glBindBuffer(GL_ARRAY_BUFFER, mBuffers[MVP_MAT_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, MVPMats, GL_DYNAMIC_DRAW);
+	}
 
+	if (WorldMats)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, mBuffers[WORLD_MAT_VB]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
+	}
+
+
+	Technique->Enable();
+	for (uint i = 0; i < mMeshEntries.size(); i++)
+	{
+		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
+		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
 
 		glDrawElementsInstanced(
 			GL_TRIANGLES,
@@ -173,7 +251,25 @@ void BasicMesh::Render(uint NumInstances, const glm::mat4* WVPMats, const glm::m
 			(void*)(sizeof(uint) * mMeshEntries[i].BaseIndex),
 			NumInstances);
 	}
+	// Make sure the VAO is not changed from the outside 
+	glBindVertexArray(0);
+}
 
+void BasicMesh::RenderStatic(BasicTechnique* Technique, uint NumInstances)
+{
+	Technique->Enable();
+	for (uint i = 0; i < mMeshEntries.size(); i++)
+	{
+		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
+		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
+
+		glDrawElementsInstanced(
+			GL_TRIANGLES,
+			mMeshEntries[i].NumIndices,
+			GL_UNSIGNED_INT,
+			(void*)(sizeof(uint) * mMeshEntries[i].BaseIndex),
+			NumInstances);
+	}
 	// Make sure the VAO is not changed from the outside 
 	glBindVertexArray(0);
 }

@@ -49,5 +49,9 @@
   <ItemGroup>
     <None Include="shaders\stencil_test.fs" />
     <None Include="shaders\stencil_test.vs" />
+    <None Include="shaders\blending.fs" />
+    <None Include="shaders\blending.vs" />
+    <None Include="shaders\unlit_instanced.vs" />
+    <None Include="shaders\unlit_instanced.fs" />
   </ItemGroup>
 </Project>

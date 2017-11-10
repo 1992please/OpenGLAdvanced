@@ -312,9 +312,9 @@ bool FbxUtil::load()
 void FbxUtil::GetStaticMeshes(std::vector<CachedMesh*>& Meshes)
 {
 	Meshes.clear();
-	const int lMeshCount = mMeshNodes.size();
+	const size_t lMeshCount = mMeshNodes.size();
 	Meshes.resize(lMeshCount);
-	for (int i = 0; i < lMeshCount; ++i)
+	for (size_t i = 0; i < lMeshCount; ++i)
 	{
 		CachedMesh* lMesh = new CachedMesh();
 		if (GetStaticMeshInfo(mMeshNodes[i], lMesh))

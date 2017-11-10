@@ -61,7 +61,7 @@ bool Texture::Load(const char* FileName)
 		glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(mTarget, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(mTarget, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(mTarget);
 		glBindTexture(mTarget, 0);
 	}

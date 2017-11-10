@@ -1,6 +1,8 @@
 #include "glfw_backend.h"
 #include "main_app.h"
 
+
+
 int main(int argc, char** argv)
 {
 	GLFWBackendInit(argc, argv);
@@ -9,7 +11,6 @@ int main(int argc, char** argv)
 		GLFWBackendTerminate();
 		return 1;
 	}
-	SRANDOM;
 
 	MainApp* pApp = new MainApp();
 

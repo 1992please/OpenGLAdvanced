@@ -9,29 +9,29 @@ GraphicsApp::GraphicsApp()
 	LARGE_INTEGER PerformanceFrequencyResult;
 	QueryPerformanceFrequency(&PerformanceFrequencyResult);
 	mPerfCounterFreq = PerformanceFrequencyResult.QuadPart;
-	mTickCounter = GetTickCounter();
+	mTickCounterStartApp = mTickCounterLastFrame = GetTickCounter();
 }
 
 void GraphicsApp::CalcFPS()
 {
 	const __int64 CurrentTickCounter = GetTickCounter();
-	const __int64 ElapsedTicks = CurrentTickCounter - mTickCounter;
+	const __int64 ElapsedTicks = CurrentTickCounter - mTickCounterLastFrame;
 	mDeltaTime = (unsigned int) ((ElapsedTicks * 1000) / mPerfCounterFreq);
 	mFps = unsigned int(mPerfCounterFreq / ElapsedTicks);
 
-	mTickCounter = CurrentTickCounter;
+	mTickCounterLastFrame = CurrentTickCounter;
 }
 
 void GraphicsApp::RenderFPS()
 {
 }
 
-float GraphicsApp::GetRunningTime()
+__int64 GraphicsApp::GetRunningTime() const
 {
-	return 0.0;
+	return ((GetTickCounter() - mTickCounterStartApp) * 1000) /  mPerfCounterFreq;
 }
 
-__int64 GraphicsApp::GetTickCounter()
+__int64 GraphicsApp::GetTickCounter() const 
 {
 	LARGE_INTEGER lCounter;
 	QueryPerformanceCounter(&lCounter);

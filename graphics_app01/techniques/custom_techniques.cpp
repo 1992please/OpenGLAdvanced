@@ -1,5 +1,6 @@
 #include "util.h"
 #include "custom_techniques.h"
+#include "../engine_common.h"
 
 LightingTechnique::LightingTechnique()
 {
@@ -90,7 +91,7 @@ bool CustomTechnique::Init()
 		return false;
 	}
 
-	if (!AddShader("shaders/stencil_test.vs", "shaders/stencil_test.fs")) {
+	if (!AddShader("shaders/blending.vs", "shaders/blending.fs")) {
 		return false;
 	}
 
@@ -141,7 +142,33 @@ void UnlitTechnique::SetMVP(const glm::mat4 & MVP)
 	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &MVP[0][0]);
 }
 
-void UnlitTechnique::SetTextureUnit(unsigned int TextureUnit)
+void UnlitTechnique::SetMaterial(const Material* mat)
 {
-	glUniform1i(mSamplerLocation, TextureUnit);
+	glUniform1i(mSamplerLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
+}
+
+bool InstancedUnlitTechnique::Init()
+{
+	if (!Technique::Init()) {
+		return false;
+	}
+
+	if (!AddShader("shaders/unlit_instanced.vs", "shaders/unlit_instanced.fs")) {
+		return false;
+	}
+
+	mSamplerLocation = GetUniformLocation("gSampler");
+
+	if (mMVPLocation == INVALID_UNIFORM_LOCATION ||
+		mSamplerLocation == INVALID_UNIFORM_LOCATION)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void InstancedUnlitTechnique::SetMaterial(const Material* mat)
+{
+	glUniform1i(mSamplerLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
 }

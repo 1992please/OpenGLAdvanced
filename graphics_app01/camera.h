@@ -4,7 +4,7 @@
 #include "keys.h"
 
 
-const float SPEED = 2.5f;
+const float SPEED = 10.f;
 const float SENSITIVTY = 0.1f;
 
 struct PersProjInfo
@@ -35,7 +35,7 @@ public:
 	inline const glm::vec3& GetPos() const{ return mPos; }
 	inline const glm::vec3& GetForward() const { return mForward; }
 	inline const glm::vec3& GetUp() const { return mUp; }
-
+	void SetPos(const glm::vec3& Pos);
 	// TODO add to ant tool bar
 private:
 	void Init();

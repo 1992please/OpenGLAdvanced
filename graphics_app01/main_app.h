@@ -12,7 +12,9 @@
 #include "basic_mesh.h"
 
 #define WINDOW_WIDTH  1280  
-#define WINDOW_HEIGHT 1024
+#define WINDOW_HEIGHT 720
+
+struct Orientation;
 
 class MainApp :public ICallbacks, public GraphicsApp
 {
@@ -25,13 +27,18 @@ public:
 	void Keyboard_callback(KEY key) override;
 	void PassiveMouse_callback(float x, float y) override;
 private:
-	BasicLightingTechnique* mTechnique;
-	CustomTechnique* mCustomTechnique;
 	Camera* GameCamera;
-	float m_scale;
 	DirectionalLight mDirectionalLight;
 	PersProjInfo mPersProjInfo;
-	BasicMesh* Mesh;
+	BasicMesh* mPlanetMesh;
+	BasicMesh* mRockMesh;
+	UnlitTechnique* mUnlitTechnique;
+	InstancedUnlitTechnique* mInstUnlitTechnique;
+	Orientation* Orientations;
+	uint mAmount;
+	glm::mat4* Models;
+	glm::mat4* MVP;
+	bool bFirstRender;
 };
 
 #endif // !MAIN_APP_H

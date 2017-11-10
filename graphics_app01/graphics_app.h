@@ -11,14 +11,15 @@ protected:
 
 	void RenderFPS();
 
-	float GetRunningTime();
+	__int64 GetRunningTime() const;
 
 	__int32 mFps;
 	unsigned int mDeltaTime;
 private:
-	__int64 mTickCounter;
+	__int64 mTickCounterLastFrame;
+	__int64 mTickCounterStartApp;
 	__int64 mPerfCounterFreq;
-	__int64 GetTickCounter();
+	__int64 GetTickCounter() const;
 };
 
 

@@ -188,8 +188,12 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\blending.fs" />
+    <None Include="shaders\blending.vs" />
     <None Include="shaders\stencil_test.fs" />
     <None Include="shaders\stencil_test.vs" />
+    <None Include="shaders\unlit_instanced.fs" />
+    <None Include="shaders\unlit_instanced.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
