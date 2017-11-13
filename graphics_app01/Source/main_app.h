@@ -5,7 +5,6 @@
 #include "graphics_app.h"
 #include "callbacks.h"
 #include <GL\glew.h>
-#include "Texture.h"
 #include "techniques/basic_lighting_technique.h"
 #include "techniques/custom_techniques.h"
 #include "camera.h"
@@ -31,14 +30,9 @@ private:
 	DirectionalLight mDirectionalLight;
 	PersProjInfo mPersProjInfo;
 	BasicMesh* mPlanetMesh;
-	BasicMesh* mRockMesh;
 	UnlitTechnique* mUnlitTechnique;
-	InstancedUnlitTechnique* mInstUnlitTechnique;
-	Orientation* Orientations;
-	uint mAmount;
-	glm::mat4* Models;
-	glm::mat4* MVP;
-	bool bFirstRender;
+	class Skybox* mSkybox;
+
 };
 
 #endif // !MAIN_APP_H

@@ -1,28 +1,30 @@
-#include <string>
 #include <GL\glew.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include <iostream>
-#include "Texture.h"
+#include "texture.h"
+#include <string.h>
 
-
-
-Texture::Texture(GLenum Target)
+Texture::Texture(const char* FileName)
 {
-	mTarget = Target;
+	mTarget = GL_TEXTURE_2D;
+	if (FileName)
+		strcpy_s(mFileName, FileName);
+	else
+		mFileName[0] = 0;
 }
 
 Texture::Texture()
 {
+	mFileName[0] = 0;
 	mTarget = GL_TEXTURE_2D;
 
 	int width = 1;
 	int height = 1;
 	GLenum format = GL_RGB;
 	float data[] = {
-		1, 1, 1};
-	glGenTextures(1, &mID);
-	glBindTexture(mTarget, mID);
+		1, 1, 1 };
+	glGenTextures(1, &mTextureID);
+	glBindTexture(mTarget, mTextureID);
 	glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -31,10 +33,11 @@ Texture::Texture()
 	glBindTexture(mTarget, 0);
 }
 
-bool Texture::Load(const char* FileName)
+bool Texture::Load()
 {
+	Clear();
 	// load and generate the texture
-	mFileName = FileName;
+	// Assuming all textures will be png
 	stbi_set_flip_vertically_on_load(true);
 	int width, height, nrComponents;
 	unsigned char *data = stbi_load(mFileName, &width, &height, &nrComponents, 0);
@@ -55,8 +58,8 @@ bool Texture::Load(const char* FileName)
 		}
 
 		// OpenGL shit here....
-		glGenTextures(1, &mID);
-		glBindTexture(mTarget, mID);
+		glGenTextures(1, &mTextureID);
+		glBindTexture(mTarget, mTextureID);
 		glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -64,31 +67,23 @@ bool Texture::Load(const char* FileName)
 		glTexImage2D(mTarget, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(mTarget);
 		glBindTexture(mTarget, 0);
+		stbi_image_free(data);
 	}
 	else
 	{
-		mID = 0;
-		std::cout << "Failed to load texture" << std::endl;
+		printf("Failed to load texture: %s\n", mFileName);
 		return false;
 	}
-	stbi_image_free(data);
 	return true;
-}
-
-void Texture::BindOffset(unsigned int index)
-{
-	assert(index < 32);
-	glActiveTexture(GL_TEXTURE0 + index);
-	glBindTexture(mTarget, mID);
-}
-
-void Texture::Bind(GLenum index)
-{
-	glActiveTexture(index);
-	glBindTexture(mTarget, mID);
 }
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &mID);
+}
+
+void Texture::Clear()
+{
+	if (mTextureID != 0)
+		glDeleteTextures(1, &mTextureID);
+	mTextureID = 0;
 }

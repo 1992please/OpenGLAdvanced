@@ -148,6 +148,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\skybox.h" />
     <ClInclude Include="Source\techniques\basic_technique.h" />
     <ClInclude Include="Source\techniques\basic_lighting_technique.h" />
     <ClInclude Include="Source\basic_mesh.h" />
@@ -164,13 +165,17 @@
     <ClInclude Include="Source\lights_common.h" />
     <ClInclude Include="Source\math_3d.h" />
     <ClInclude Include="Source\pipeline.h" />
-    <ClInclude Include="Source\stb_image.h" />
+    <ClInclude Include="Source\textures\cubemap_texture.h" />
+    <ClInclude Include="Source\textures\stb_image.h" />
+    <ClInclude Include="Source\techniques\skybox_technique.h" />
     <ClInclude Include="Source\techniques\technique.h" />
-    <ClInclude Include="Source\texture.h" />
+    <ClInclude Include="Source\textures\texture.h" />
+    <ClInclude Include="Source\textures\texture_base.h" />
     <ClInclude Include="Source\types.h" />
     <ClInclude Include="Source\util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\skybox.cpp" />
     <ClCompile Include="Source\techniques\basic_technique.cpp" />
     <ClCompile Include="Source\techniques\basic_lighting_technique.cpp" />
     <ClCompile Include="Source\basic_mesh.cpp" />
@@ -183,13 +188,18 @@
     <ClCompile Include="Source\main_app.cpp" />
     <ClCompile Include="Source\pipeline.cpp" />
     <ClCompile Include="Source\Source.cpp" />
+    <ClCompile Include="Source\techniques\skybox_technqiue.cpp" />
     <ClCompile Include="Source\techniques\technique.cpp" />
-    <ClCompile Include="Source\texture.cpp" />
+    <ClCompile Include="Source\textures\cubemap_texture.cpp" />
+    <ClCompile Include="Source\textures\texture.cpp" />
+    <ClCompile Include="Source\textures\texture_base.cpp" />
     <ClCompile Include="Source\util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\blending.fs" />
     <None Include="shaders\blending.vs" />
+    <None Include="shaders\skybox.fs" />
+    <None Include="shaders\skybox.vs" />
     <None Include="shaders\stencil_test.fs" />
     <None Include="shaders\stencil_test.vs" />
     <None Include="shaders\unlit_instanced.fs" />

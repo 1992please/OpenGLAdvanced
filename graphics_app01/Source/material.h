@@ -15,6 +15,7 @@ public:
 		glm::vec3 mColor;
 		void LoadTexture(const char* TexPath);
 		void LoadColor(float* Color);
+		void Clear();
 		ColorChannel();
 		~ColorChannel();
 	};

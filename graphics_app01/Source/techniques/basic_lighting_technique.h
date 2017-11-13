@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BASIC_LIGHTING_TECHNIQUE_H
+#define BASIC_LIGHTING_TECHNIQUE_H
 
 #include "basic_technique.h"
 #include "lights_common.h"
@@ -68,3 +69,5 @@ private:
 		} Atten;
 	} mSpotLightsLocation[MAX_SPOT_LIGHTS];
 };
+
+#endif

@@ -4,7 +4,7 @@
 #include "util.h"
 #include "material.h"
 #include <GL/glew.h>
-#include "Texture.h"
+#include "textures/texture.h"
 #include "engine_common.h"
 #include "techniques/basic_technique.h"
 
@@ -70,7 +70,7 @@ void BasicMesh::Clear()
 	}
 }
 
-bool BasicMesh::LoadMesh(const char* Filename)
+bool BasicMesh::LoadMesh(const char* Filename, bool bWithMaterials)
 {
 	// Release the previously loaded mesh (if it exists)
 	Clear();
@@ -99,15 +99,19 @@ bool BasicMesh::LoadMesh(const char* Filename)
 			}
 
 			// Init Materials................................
+
 			mMaterials.resize(lCachedMesh->mSubMeshesCount);
 			for (uint i = 0; i < mMaterials.size(); i++)
 			{
 				mMaterials[i] = new Material();
-				mMaterials[i]->mDiffuse.LoadTexture(lCachedMesh->mMaterials[i]->mDiffuse.TexturePath);
-				mMaterials[i]->mDiffuse.LoadColor(lCachedMesh->mMaterials[i]->mDiffuse.mColor);
-				mMaterials[i]->mSpecular.LoadTexture(lCachedMesh->mMaterials[i]->mSpecular.TexturePath);
-				mMaterials[i]->mSpecular.LoadColor(lCachedMesh->mMaterials[i]->mSpecular.mColor);
-				mMaterials[i]->mShininess = lCachedMesh->mMaterials[i]->mShinness;
+				if (bWithMaterials)
+				{
+					mMaterials[i]->mDiffuse.LoadTexture(lCachedMesh->mMaterials[i]->mDiffuse.TexturePath);
+					mMaterials[i]->mDiffuse.LoadColor(lCachedMesh->mMaterials[i]->mDiffuse.mColor);
+					mMaterials[i]->mSpecular.LoadTexture(lCachedMesh->mMaterials[i]->mSpecular.TexturePath);
+					mMaterials[i]->mSpecular.LoadColor(lCachedMesh->mMaterials[i]->mSpecular.mColor);
+					mMaterials[i]->mShininess = lCachedMesh->mMaterials[i]->mShinness;
+				}
 			}
 
 			// Generate and populate the buffers with vertex attributes and the indices
@@ -177,11 +181,11 @@ bool BasicMesh::LoadMesh(ShapeType Type)
 	switch (Type)
 	{
 		case ShapeType_Cube:
-			return LoadMesh("content/basic_shapes/cube.fbx");
+			return LoadMesh("content/basic_shapes/cube.fbx", false);
 		case ShapeType_Quad:
-			return LoadMesh("content/basic_shapes/quad.fbx");
+			return LoadMesh("content/basic_shapes/quad.fbx", false);
 		case ShapeType_Sphere:
-			return LoadMesh("content/basic_shapes/sphere.fbx");
+			return LoadMesh("content/basic_shapes/sphere.fbx", false);
 		default:
 			return false;
 	}
@@ -206,11 +210,8 @@ void BasicMesh::Render(BasicTechnique* Technique)
 	Technique->Enable();
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
-		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
-		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
-
-		//mMaterials[i]->mSpecular.mColor = glm::vec3(1);
 		Technique->SetMaterial(mMaterials[i]);
+
 		glDrawElements(
 			GL_TRIANGLES,
 			mMeshEntries[i].NumIndices,
@@ -241,8 +242,7 @@ void BasicMesh::RenderDynamic(BasicTechnique* Technique, uint NumInstances, cons
 	Technique->Enable();
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
-		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
-		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
+		Technique->SetMaterial(mMaterials[i]);
 
 		glDrawElementsInstanced(
 			GL_TRIANGLES,
@@ -260,8 +260,7 @@ void BasicMesh::RenderStatic(BasicTechnique* Technique, uint NumInstances)
 	Technique->Enable();
 	for (uint i = 0; i < mMeshEntries.size(); i++)
 	{
-		mMaterials[i]->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
-		mMaterials[i]->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
+		Technique->SetMaterial(mMaterials[i]);
 
 		glDrawElementsInstanced(
 			GL_TRIANGLES,

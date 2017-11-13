@@ -1,6 +1,8 @@
 #include "util.h"
 #include "custom_techniques.h"
 #include "../engine_common.h"
+#include "textures/texture.h"
+#include "material.h"
 
 LightingTechnique::LightingTechnique()
 {
@@ -144,6 +146,7 @@ void UnlitTechnique::SetMVP(const glm::mat4 & MVP)
 
 void UnlitTechnique::SetMaterial(const Material* mat)
 {
+	mat->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
 	glUniform1i(mSamplerLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
 }
 
@@ -170,5 +173,6 @@ bool InstancedUnlitTechnique::Init()
 
 void InstancedUnlitTechnique::SetMaterial(const Material* mat)
 {
+	mat->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
 	glUniform1i(mSamplerLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
 }

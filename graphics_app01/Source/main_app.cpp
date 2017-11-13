@@ -4,15 +4,14 @@
 #include "main_app.h"
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
-#include "glm/ext.hpp"
+#include "skybox.h"
+
 
 MainApp::MainApp()
 {
 	mUnlitTechnique = NULL;
-	mInstUnlitTechnique = NULL;
 	GameCamera = NULL;
 	mPlanetMesh = NULL;
-	mRockMesh = NULL;
 
 	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	mDirectionalLight.AmbientIntensity = .2f;
@@ -21,20 +20,16 @@ MainApp::MainApp()
 	mPersProjInfo.FOV = 60.0f;
 	mPersProjInfo.Height = WINDOW_HEIGHT;
 	mPersProjInfo.Width = WINDOW_WIDTH;
-	mPersProjInfo.zNear = 1.0f;
+	mPersProjInfo.zNear = 1.f;
 	mPersProjInfo.zFar = 1000.0f;
-	bFirstRender = true;
-	mAmount = 200000;
 }
 
 MainApp::~MainApp()
 {
 	delete GameCamera;
-	delete mRockMesh;
+	delete mPlanetMesh;
 	delete mUnlitTechnique;
-	delete mInstUnlitTechnique;
-	delete[] Models;
-	delete[] MVP;
+
 }
 
 bool MainApp::Init()
@@ -45,52 +40,29 @@ bool MainApp::Init()
 	if (!mUnlitTechnique->Init())
 		return false;
 
-	mInstUnlitTechnique = new InstancedUnlitTechnique();
-	if (!mInstUnlitTechnique->Init())
-		return false;
-
 	mPlanetMesh = new BasicMesh();
 	if (!mPlanetMesh->LoadMesh("content/planet.fbx"))
 		return false;
 
-	mRockMesh = new BasicMesh();
-	if (!mRockMesh->LoadMesh("content/rock.fbx"))
-		return false;
-
-	srand(0);
-
-
-	Orientations = new Orientation[mAmount];
-	float radius = 50.0;
-	float offset = 20.f;
-	for (uint i = 0; i < mAmount; i++)
+	mSkybox = new Skybox(GameCamera, mPersProjInfo);
+	if (!mSkybox->Init(
+		"content/skybox/right.jpg",
+		"content/skybox/left.jpg",
+		"content/skybox/top.jpg",
+		"content/skybox/bottom.jpg",
+		"content/skybox/back.jpg",
+		"content/skybox/front.jpg"))
 	{
-		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)mAmount * 360.0f;
-		float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.1f; // keep height of asteroid field smaller compared to width of x and z
-		displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
-		Orientations[i].mWorldPos = glm::vec3(x, y, z);
-
-		// 2. scale: Scale between 0.05 and 0.25f
-		float scale = (rand() % 20) / 100.0f + 0.05f;
-		Orientations[i].mScale = glm::vec3(scale);
-
-		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-		float rotAngle = float(rand() % 360);
-		Orientations[i].mRotation = glm::vec3(0.0f, 0.0f, rotAngle);
+		return false;
 	}
-	Models = new glm::mat4[mAmount];
-	MVP = new glm::mat4[mAmount];
 	return true;
 }
 
 void MainApp::Run()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.1f, 0.1f, 0.5f, 0.0f);
+	glEnable(GL_MULTISAMPLE);
+
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
@@ -117,28 +89,9 @@ void MainApp::RenderScene_callback()
 	mUnlitTechnique->SetMVP(VP * p.GetModelTrans());
 	mPlanetMesh->Render(mUnlitTechnique);
 
-	// render the rocks
-	p.Scale(glm::vec3(1.0f));
-	if (bFirstRender)
-	{
-		bFirstRender = !bFirstRender;
-		for (uint i = 0; i < mAmount; i++)
-		{
-			p.Orient(Orientations[i]);
-			Models[i] = p.GetModelTrans();
-		}
-	}
-	__int64 Time = GetRunningTime();
-	for (uint i = 0; i < mAmount; i++)
-	{
-		p.Orient(Orientations[i]);
-		MVP[i] = VP * Models[i];
-	}
-	printf("1: %I64d, ", GetRunningTime() - Time);
-	Time = GetRunningTime();
-	mRockMesh->RenderDynamic(mInstUnlitTechnique, mAmount, MVP, NULL);
-	printf("2: %I64d, fps: %d\n", GetRunningTime() - Time, mFps);
 
+	// Always render the skybox last
+	mSkybox->Render();
 }
 
 void MainApp::Keyboard_callback(KEY key)

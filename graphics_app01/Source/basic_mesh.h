@@ -37,14 +37,14 @@ public:
 	BasicMesh();
 	~BasicMesh();
 
-	bool LoadMesh(const char* Filename);
+	bool LoadMesh(const char* Filename, bool bWithMaterials = true);
 	bool LoadMesh(ShapeType Type);
 	// use this one wisely( maybe when the camera is static)
 	bool InitInstancedStatic(uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
 	void Render(BasicTechnique* Technique);
 	void RenderDynamic(BasicTechnique* Technique, uint NumInstances, const glm::mat4* WVPMats, const glm::mat4* WorldMats);
 	void RenderStatic(BasicTechnique* Technique, uint NumInstances);
-private:
+protected:
 	void Clear();
 	
 	enum

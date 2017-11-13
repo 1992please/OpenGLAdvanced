@@ -51,6 +51,28 @@ namespace
 	}
 }
 
+glm::mat4 Pipeline::GetViewMat(const Camera* camera)
+{
+	return InitCameraTransform(camera->GetForward(), camera->GetUp(), camera->GetPos());
+}
+
+glm::mat4 Pipeline::GetModelMat(const Orientation & ori)
+{
+	glm::mat4 M;
+	M = glm::translate(M, ori.mWorldPos);
+	M = glm::scale(M, ori.mScale);
+	M = glm::rotate(M, ori.mRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	M = glm::rotate(M, ori.mRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	M = glm::rotate(M, ori.mRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	return M;
+}
+
+glm::mat4 Pipeline::GetProjMat(const PersProjInfo& p)
+{
+	return InitPersProjTransform(p);
+}
+
 Pipeline::Pipeline()
 {
 	mScale = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -110,11 +132,12 @@ void Pipeline::SetCamera(const glm::vec3 & Pos, const glm::vec3 Forward, const g
 	mCamera.Pos = Pos;
 	mCamera.Forward = Forward;
 	mCamera.Up = Up;
+	GetViewTrans();
 }
 
-void Pipeline::SetCamera(const Camera & camera)
+void Pipeline::SetCamera(const Camera* camera)
 {
-	SetCamera(camera.GetPos(), camera.GetForward(), camera.GetUp());
+	SetCamera(camera->GetPos(), camera->GetForward(), camera->GetUp());
 }
 
 void Pipeline::Orient(const Orientation & o)

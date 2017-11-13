@@ -21,6 +21,10 @@ struct Orientation
 class Pipeline
 {
 public:
+	static glm::mat4 GetViewMat(const Camera* camera);
+	static glm::mat4 GetModelMat(const Orientation& ori);
+	static glm::mat4 GetProjMat(const PersProjInfo& p);
+
 	Pipeline();
 	void Scale(float s);
 	void Scale(const glm::vec3& scale);
@@ -31,7 +35,7 @@ public:
 	void Rotate(const glm::vec3& r);
 	void SetPerspectiveProj(const PersProjInfo& p);
 	void SetCamera(const glm::vec3& Pos, const glm::vec3 Target, const glm::vec3& Up);
-	void SetCamera(const Camera& camera);
+	void SetCamera(const Camera* camera);
 	void Orient(const Orientation& o);
 
 	const glm::mat4& GetMPTrans();

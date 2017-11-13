@@ -1,8 +1,8 @@
-
 #include "basic_lighting_technique.h"
 #include "util.h"
 #include "engine_common.h"
 #include "material.h"
+#include <textures/texture.h>
 
 BasicLightingTechnique::BasicLightingTechnique()
 {
@@ -156,6 +156,8 @@ void BasicLightingTechnique::SetEyeWorldPos(const glm::vec3& EyeWorldPos)
 
 void BasicLightingTechnique::SetMaterial(const Material* mat)
 {
+	mat->mDiffuse.mTexture->Bind(DIFFUSE_TEXTURE_UNIT);
+	mat->mSpecular.mTexture->Bind(SPECULAR_TEXTURE_UNIT);
 	glUniform1i(mMaterial.Diffuse.TexLocation, DIFFUSE_TEXTURE_UNIT_INDEX);
 	glUniform1i(mMaterial.Specular.TexLocation, SPECULAR_TEXTURE_UNIT_INDEX);
 	glUniform1f(mMaterial.Shininess, mat->mShininess);
@@ -163,7 +165,6 @@ void BasicLightingTechnique::SetMaterial(const Material* mat)
 	glUniform3f(mMaterial.Diffuse.Color, tempColor.x, tempColor.y, tempColor.z);
 	tempColor = mat->mSpecular.mColor;
 	glUniform3f(mMaterial.Specular.Color, tempColor.x, tempColor.y, tempColor.z);
-
 }
 
 void BasicLightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)

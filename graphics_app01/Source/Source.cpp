@@ -5,6 +5,7 @@
 
 int main(int argc, char** argv)
 {
+	system("color f0");
 	GLFWBackendInit(argc, argv);
 	if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Graphics Engine"))
 	{

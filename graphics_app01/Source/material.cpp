@@ -1,5 +1,5 @@
 #include "material.h"
-#include "texture.h"
+#include "textures/texture.h"
 #include "util.h"
 
 Material::Material()
@@ -13,8 +13,9 @@ Material::~Material()
 
 void Material::ColorChannel::LoadTexture(const char* TexPath)
 {
-	Texture* temp = new Texture(GL_TEXTURE_2D);
-	if (TexPath && temp->Load(TexPath))
+	Clear();
+	Texture* temp = new Texture(TexPath);
+	if (TexPath && temp->Load())
 	{
 		mTexture = temp;
 	}
@@ -32,13 +33,18 @@ void Material::ColorChannel::LoadColor(float* Color)
 	mColor.b = Color[2];
 }
 
+void Material::ColorChannel::Clear()
+{
+	SAFE_DELETE(mTexture);
+}
+
 Material::ColorChannel::ColorChannel()
 {
-	mTexture = NULL;
+	mTexture = new Texture();
 	mColor = glm::vec3(1.0, 1.0, 1.0);
 }
 
 Material::ColorChannel::~ColorChannel()
 {
-	SAFE_DELETE(mTexture);
+	Clear();
 }
