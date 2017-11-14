@@ -32,6 +32,8 @@
     <ClInclude Include="Source\textures\cubemap_texture.h" />
     <ClInclude Include="Source\textures\texture.h" />
     <ClInclude Include="Source\textures\texture_base.h" />
+    <ClInclude Include="Source\techniques\reflective_technique.h" />
+    <ClInclude Include="Source\techniques\refractive_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\techniques\basic_lighting_technique.cpp" />
@@ -49,10 +51,12 @@
     <ClCompile Include="Source\Source.cpp" />
     <ClCompile Include="Source\util.cpp" />
     <ClCompile Include="Source\skybox.cpp" />
-    <ClCompile Include="Source\techniques\skybox_technqiue.cpp" />
     <ClCompile Include="Source\textures\cubemap_texture.cpp" />
     <ClCompile Include="Source\textures\texture.cpp" />
     <ClCompile Include="Source\textures\texture_base.cpp" />
+    <ClCompile Include="Source\techniques\reflective_technique.cpp" />
+    <ClCompile Include="Source\techniques\skybox_technique.cpp" />
+    <ClCompile Include="Source\techniques\refractive_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\stencil_test.fs" />
@@ -63,5 +67,7 @@
     <None Include="shaders\unlit_instanced.fs" />
     <None Include="shaders\skybox.vs" />
     <None Include="shaders\skybox.fs" />
+    <None Include="shaders\r_shader.fs" />
+    <None Include="shaders\r_shader.vs" />
   </ItemGroup>
 </Project>

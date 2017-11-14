@@ -13,11 +13,10 @@ public:
 	virtual bool Init() override;
 
 	void SetVP(const glm::mat4& VP);
-	void SetTextureUnit(unsigned int TextureUnitIndex);
-	void SetMaterial(const Material* mat) override {};
+	void SetMaterial(const Material* mat) override;
 private:
 	GLuint mMVPLocation;
-	GLuint mTextureLocation;
+	GLuint mCubeBoxTexture;
 };
 
 #endif

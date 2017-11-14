@@ -5,46 +5,51 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <iostream>
 #include "skybox.h"
-
+#include "techniques\reflective_technique.h"
+#include "techniques\refractive_technique.h"
+#include "textures\cubemap_texture.h"
+#include "engine_common.h"
 
 MainApp::MainApp()
 {
-	mUnlitTechnique = NULL;
-	GameCamera = NULL;
-	mPlanetMesh = NULL;
+	mReflectiveTechnique = NULL;
+	mRefractiveTechnique = NULL;
+	mCamera = NULL;
+	mSphere = NULL;
 
-	mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	mDirectionalLight.AmbientIntensity = .2f;
-	mDirectionalLight.DiffuseIntensity = 1.0f;
-	mDirectionalLight.Direction = glm::vec3(0.5f, -0.5f, 0.5f);
 	mPersProjInfo.FOV = 60.0f;
 	mPersProjInfo.Height = WINDOW_HEIGHT;
 	mPersProjInfo.Width = WINDOW_WIDTH;
-	mPersProjInfo.zNear = 1.f;
+	mPersProjInfo.zNear = 0.1f;
 	mPersProjInfo.zFar = 1000.0f;
 }
 
 MainApp::~MainApp()
 {
-	delete GameCamera;
-	delete mPlanetMesh;
-	delete mUnlitTechnique;
+	delete mCamera;
+	delete mSphere;
 
+	delete mReflectiveTechnique;
+	delete mRefractiveTechnique;
 }
 
 bool MainApp::Init()
 {
-	GameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+	mCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	mUnlitTechnique = new UnlitTechnique();
-	if (!mUnlitTechnique->Init())
+	mReflectiveTechnique = new ReflectiveTechnique();
+	if (!mReflectiveTechnique->Init())
 		return false;
 
-	mPlanetMesh = new BasicMesh();
-	if (!mPlanetMesh->LoadMesh("content/planet.fbx"))
+	mRefractiveTechnique = new RefractiveTechnique();
+	if (!mRefractiveTechnique->Init())
 		return false;
 
-	mSkybox = new Skybox(GameCamera, mPersProjInfo);
+	mSphere = new BasicMesh();
+	if (!mSphere->LoadMesh(ShapeType_Cube))
+		return false;
+
+	mSkybox = new Skybox(mCamera, mPersProjInfo);
 	if (!mSkybox->Init(
 		"content/skybox/right.jpg",
 		"content/skybox/left.jpg",
@@ -77,18 +82,27 @@ void MainApp::Run()
 void MainApp::RenderScene_callback()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	mSkybox->GetCubeMapTex()->Bind(DIFFUSE_TEXTURE_UNIT);
 	// Some Calculations every frame
 	CalcFPS();
-	Pipeline p;
-	p.SetCamera(GameCamera->GetPos(), GameCamera->GetForward(), GameCamera->GetUp());
-	p.SetPerspectiveProj(mPersProjInfo);
-	glm::mat4 VP = p.GetVPTrans();
-	mUnlitTechnique->Enable();
-	p.Scale(glm::vec3(4.0f));
-	p.WorldPos(0.0f, -5.0f, 0.0f);
-	mUnlitTechnique->SetMVP(VP * p.GetModelTrans());
-	mPlanetMesh->Render(mUnlitTechnique);
+	glm::mat4 V = Pipeline::GetViewMat(mCamera);
+	glm::mat4 P = Pipeline::GetProjMat(mPersProjInfo);
+	glm::mat4 VP = P * V;
+	glm::mat4 M;
+	mRefractiveTechnique->Enable();
+	mRefractiveTechnique->SetMVP(VP);
+	mRefractiveTechnique->SetModel(M);
+	mRefractiveTechnique->SetCamerPos(mCamera->GetPos());
+	mSphere->Render(mRefractiveTechnique);
 
+	Orientation ori;
+	ori.mWorldPos = glm::vec3(2, 0, 0);
+	M = Pipeline::GetModelMat(ori);
+	mReflectiveTechnique->Enable();
+	mReflectiveTechnique->SetMVP(VP * M);
+	mReflectiveTechnique->SetModel(M);
+	mReflectiveTechnique->SetCamerPos(mCamera->GetPos());
+	mSphere->Render(mReflectiveTechnique);
 
 	// Always render the skybox last
 	mSkybox->Render();
@@ -103,19 +117,17 @@ void MainApp::Keyboard_callback(KEY key)
 			break;
 
 		case KEY_Z:
-			mDirectionalLight.AmbientIntensity += 0.0005f * mDeltaTime;
 			break;
 
 		case KEY_X:
-			mDirectionalLight.AmbientIntensity -= 0.0005f * mDeltaTime;
 			break;
 		default:
 			break;
 	}
-	GameCamera->OnKeyboard(key, (float)mDeltaTime / 1000);
+	mCamera->OnKeyboard(key, (float)mDeltaTime / 1000);
 }
 
 void MainApp::PassiveMouse_callback(float x, float y)
 {
-	GameCamera->OnMouse(x, y);
+	mCamera->OnMouse(x, y);
 }

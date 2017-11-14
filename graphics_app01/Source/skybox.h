@@ -21,7 +21,7 @@ public:
 		const char* FrontFilename);
 
 	void Render();
-
+	inline CubemapTexture* GetCubeMapTex() const { return mCubemapTex; }
 private:
 	class SkyboxTechnique* mSkyboxTechnique;
 	const Camera* mCamera;

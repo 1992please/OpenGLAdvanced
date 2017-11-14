@@ -42,7 +42,6 @@ bool Skybox::Init(
 		return false;
 	}
 	mSkyboxTechnique->Enable();
-	mSkyboxTechnique->SetTextureUnit(DIFFUSE_TEXTURE_UNIT_INDEX);
 
 	mCubemapTex = new CubemapTexture(
 		RightFilename,

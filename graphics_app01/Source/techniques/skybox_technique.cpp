@@ -1,5 +1,6 @@
 #include "skybox_technique.h"
 #include "util.h"
+#include "engine_common.h"
 
 SkyboxTechnique::SkyboxTechnique()
 {
@@ -17,10 +18,10 @@ bool SkyboxTechnique::Init()
 	}
 
 	mMVPLocation = GetUniformLocation("gVP");
-	mTextureLocation = GetUniformLocation("gCubemapTexture");
+	mCubeBoxTexture = GetUniformLocation("gCubemapTexture");
 
 	if (mMVPLocation == INVALID_UNIFORM_LOCATION ||
-		mTextureLocation == INVALID_UNIFORM_LOCATION) {
+		mCubeBoxTexture == INVALID_UNIFORM_LOCATION) {
 		return false;
 	}
 	return true;
@@ -32,7 +33,7 @@ void SkyboxTechnique::SetVP(const glm::mat4& VP)
 	glUniformMatrix4fv(mMVPLocation, 1, GL_FALSE, &VP[0][0]);
 }
 
-void SkyboxTechnique::SetTextureUnit(unsigned int TextureUnitIndex)
+void SkyboxTechnique::SetMaterial(const Material* mat)
 {
-	glUniform1i(mTextureLocation, TextureUnitIndex);
+	glUniform1i(mCubeBoxTexture, DIFFUSE_TEXTURE_UNIT);
 }

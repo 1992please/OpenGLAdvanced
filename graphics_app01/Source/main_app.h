@@ -5,8 +5,6 @@
 #include "graphics_app.h"
 #include "callbacks.h"
 #include <GL\glew.h>
-#include "techniques/basic_lighting_technique.h"
-#include "techniques/custom_techniques.h"
 #include "camera.h"
 #include "basic_mesh.h"
 
@@ -25,12 +23,13 @@ public:
 	void RenderScene_callback() override;
 	void Keyboard_callback(KEY key) override;
 	void PassiveMouse_callback(float x, float y) override;
+
 private:
-	Camera* GameCamera;
-	DirectionalLight mDirectionalLight;
+	Camera* mCamera;
 	PersProjInfo mPersProjInfo;
-	BasicMesh* mPlanetMesh;
-	UnlitTechnique* mUnlitTechnique;
+	BasicMesh* mSphere;
+	class ReflectiveTechnique* mReflectiveTechnique;
+	class RefractiveTechnique* mRefractiveTechnique;
 	class Skybox* mSkybox;
 
 };

@@ -4,7 +4,7 @@
 #include "keys.h"
 
 
-const float SPEED = 10.f;
+const float SPEED = 2.5f;
 const float SENSITIVTY = 0.1f;
 
 struct PersProjInfo
